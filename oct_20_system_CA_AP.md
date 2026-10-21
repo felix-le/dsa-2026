@@ -35,3 +35,5 @@ CAP Theorem — Quick Quiz
 5. A social media like count should be:
    A. AP
    B. CP
+
+1B, 2B, 3A, 4B, 5A
