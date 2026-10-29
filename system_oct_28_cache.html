@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <link rel="icon" href="data:," />
+    <title>Lesson 7 Cache — Notebook Copy (Session 7)</title>
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: #000000;
+        color: #ffffff;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        font-size: 21px;
+        line-height: 1.8;
+      }
+      .wrap {
+        max-width: 780px;
+        margin: 0 auto;
+        padding: 28px 18px 64px;
+      }
+      h1 {
+        font-size: 34px;
+        line-height: 1.3;
+        margin: 0 0 10px;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+      }
+      h2 {
+        font-size: 27px;
+        line-height: 1.35;
+        margin: 0 0 14px;
+        font-weight: 750;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      h3 {
+        font-size: 23px;
+        line-height: 1.4;
+        margin: 0 0 8px;
+        font-weight: 700;
+      }
+      p { margin: 0 0 14px; }
+      p:last-child { margin-bottom: 0; }
+      ul {
+        margin: 0 0 6px;
+        padding-left: 26px;
+      }
+      li { margin-bottom: 8px; }
+      li:last-child { margin-bottom: 0; }
+      strong { font-weight: 700; color: #ffffff; }
+      a { color: #7dd3fc; }
+      .icon {
+        flex: 0 0 auto;
+        width: 34px;
+        height: 34px;
+        margin-top: 3px;
+      }
+      .icon svg { display: block; width: 34px; height: 34px; }
+      .lead {
+        color: #d4d4d4;
+        font-size: 21px;
+        margin-bottom: 0;
+      }
+      .scope {
+        background: #111827;
+        border: 1px solid #334155;
+        border-radius: 10px;
+        padding: 16px 20px;
+        margin-top: 20px;
+        font-size: 20px;
+      }
+      .scope strong { color: #bae6fd; }
+      .card {
+        background: #101010;
+        border: 1px solid #2b2b2b;
+        border-radius: 14px;
+        padding: 26px 24px;
+        margin-bottom: 26px;
+      }
+      .subcard {
+        background: #1a1a1a;
+        border: 1px solid #333333;
+        border-radius: 10px;
+        padding: 18px 20px;
+        margin-bottom: 16px;
+      }
+      .subcard:last-child { margin-bottom: 0; }
+      .tag {
+        display: inline-block;
+        font-size: 15px;
+        line-height: 1.4;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 3px 10px;
+        border-radius: 999px;
+        margin-bottom: 10px;
+      }
+      .tag-hit { background: #14532d; color: #bbf7d0; }
+      .tag-miss { background: #7f1d1d; color: #fecaca; }
+      .tag-example { background: #1e3a5f; color: #bfdbfe; }
+      .tag-link { background: #3b2f63; color: #ddd6fe; }
+      .tag-pattern { background: #422006; color: #fde68a; }
+      .toc {
+        background: #101010;
+        border: 1px solid #2b2b2b;
+        border-radius: 14px;
+        padding: 22px 24px;
+        margin-bottom: 26px;
+      }
+      .toc h2 { font-size: 24px; margin-bottom: 10px; }
+      .toc ol {
+        margin: 0;
+        padding-left: 28px;
+      }
+      .toc li { margin-bottom: 6px; }
+      .toc a {
+        color: #ffffff;
+        text-decoration: none;
+        border-bottom: 1px solid #3f3f46;
+      }
+      .toc a:hover, .toc a:focus { color: #7dd3fc; border-bottom-color: #7dd3fc; }
+      .backtop {
+        text-align: right;
+        margin: -8px 4px 26px;
+        font-size: 18px;
+      }
+      .backtop a {
+        color: #a1a1aa;
+        text-decoration: none;
+        border-bottom: 1px solid #3f3f46;
+      }
+      .backtop a:hover, .backtop a:focus { color: #7dd3fc; }
+      .diagram {
+        background: #0a0a0a;
+        border: 1px solid #2b2b2b;
+        border-radius: 10px;
+        padding: 14px 10px 6px;
+        margin: 18px 0 20px;
+        text-align: center;
+      }
+      .diagram svg { max-width: 100%; height: auto; }
+      .flow-label {
+        font-size: 17px;
+        color: #a1a1aa;
+        margin: 4px 0 10px;
+      }
+      .qa {
+        background: #1a1a1a;
+        border: 1px solid #333333;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 18px;
+      }
+      .qa:last-child { margin-bottom: 0; }
+      .q-num {
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #a1a1aa;
+        margin-bottom: 6px;
+      }
+      .q-text {
+        font-weight: 700;
+        margin-bottom: 12px;
+      }
+      .answer {
+        background: #0b1f13;
+        border: 1px solid #1f4630;
+        border-radius: 8px;
+        padding: 14px 16px;
+      }
+      .answer .a-label {
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #86efac;
+        margin-bottom: 4px;
+      }
+      .answer p { margin: 0; }
+      .source {
+        font-size: 17px;
+        color: #a1a1aa;
+        margin-top: 12px;
+        font-style: italic;
+      }
+      .source-practice {
+        color: #fde68a;
+        font-style: normal;
+        font-weight: 600;
+      }
+      .kw-group { margin-bottom: 20px; }
+      .kw-group:last-child { margin-bottom: 0; }
+      .kw-group h3 { margin-bottom: 6px; }
+      .kw-list {
+        color: #e4e4e7;
+        margin: 0;
+      }
+      .next-box {
+        background: #111827;
+        border: 1px solid #334155;
+        border-radius: 14px;
+        padding: 24px;
+        margin-bottom: 26px;
+      }
+      .next-box h2 { font-size: 25px; }
+      .next-box ul { margin-bottom: 0; }
+      @media (max-width: 560px) {
+        .wrap { padding: 20px 12px 52px; }
+        .card, .toc, .next-box { padding: 22px 18px; }
+        h1 { font-size: 30px; }
+        h2 { font-size: 25px; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrap" id="top">
+
+      <!-- Header -->
+      <header class="card">
+        <h1>Lesson 7 — Cache</h1>
+        <p class="lead">Notebook Copy — Session 7</p>
+        <div class="scope">
+          <strong>Scope:</strong> Sections 1–4 only, plus the 10 quiz questions and answers.
+          Short version for copying into your notebook — the key ideas, not the full lesson.
+        </div>
+      </header>
+
+      <!-- Table of contents -->
+      <nav class="toc" aria-label="Contents">
+        <h2>Contents</h2>
+        <ol>
+          <li><a href="#s1">What Is Cache?</a></li>
+          <li><a href="#s2">Where to Put the Cache (Placement)</a></li>
+          <li><a href="#s3">What to Cache (Granularity)</a></li>
+          <li><a href="#s4">Four Cache Patterns</a></li>
+          <li><a href="#quiz">Quiz — 10 Questions and Answers</a></li>
+          <li><a href="#keywords">Keywords</a></li>
+          <li><a href="#next">Next — Session 8</a></li>
+        </ol>
+      </nav>
+
+      <!-- Section 1 -->
+      <section class="card" id="s1">
+        <h2>
+          <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#7dd3fc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg></span>
+          <span>1. What Is Cache?</span>
+        </h2>
+        <p><strong>Cache</strong> stores previously computed results, so the next request can reuse them instead of computing them again.</p>
+        <p>A cache in front of the database <strong>absorbs reads</strong> (takes the read traffic first). This reduces <strong>database load</strong> and <strong>latency</strong> (response delay).</p>
+
+        <div class="diagram" role="img" aria-label="Flow diagram: a request checks the cache first. On a hit, the cache returns the data at once. On a miss, the data is fetched from the database, stored in the cache, then returned.">
+          <svg viewBox="0 0 620 250" xmlns="http://www.w3.org/2000/svg" font-family="inherit">
+            <rect x="230" y="8" width="160" height="44" rx="8" fill="#1a1a1a" stroke="#52525b"/>
+            <text x="310" y="36" text-anchor="middle" fill="#ffffff" font-size="17" font-weight="700">Request</text>
+            <line x1="310" y1="52" x2="310" y2="76" stroke="#7dd3fc" stroke-width="2"/>
+            <polygon points="310,84 304,72 316,72" fill="#7dd3fc"/>
+            <rect x="230" y="86" width="160" height="44" rx="8" fill="#1e3a5f" stroke="#3b82f6"/>
+            <text x="310" y="114" text-anchor="middle" fill="#ffffff" font-size="17" font-weight="700">Cache</text>
+            <line x1="230" y1="108" x2="130" y2="108" stroke="#4ade80" stroke-width="2"/>
+            <line x1="130" y1="108" x2="130" y2="150" stroke="#4ade80" stroke-width="2"/>
+            <polygon points="130,158 124,146 136,146" fill="#4ade80"/>
+            <rect x="40" y="160" width="180" height="52" rx="8" fill="#14532d" stroke="#22c55e"/>
+            <text x="130" y="183" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="700">HIT</text>
+            <text x="130" y="203" text-anchor="middle" fill="#bbf7d0" font-size="14">Return at once</text>
+            <line x1="390" y1="108" x2="490" y2="108" stroke="#f87171" stroke-width="2"/>
+            <line x1="490" y1="108" x2="490" y2="150" stroke="#f87171" stroke-width="2"/>
+            <polygon points="490,158 484,146 496,146" fill="#f87171"/>
+            <rect x="400" y="160" width="180" height="52" rx="8" fill="#7f1d1d" stroke="#ef4444"/>
+            <text x="490" y="183" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="700">MISS</text>
+            <text x="490" y="203" text-anchor="middle" fill="#fecaca" font-size="14">Go to the database</text>
+            <text x="310" y="240" text-anchor="middle" fill="#a1a1aa" font-size="14">Miss path: fetch from database → store in cache → return</text>
+          </svg>
+          <p class="flow-label">Every read checks the cache first.</p>
+        </div>
+
+        <div class="subcard">
+          <span class="tag tag-hit">Hit</span>
+          <p>The cache <strong>has</strong> the data. Return it immediately.</p>
+        </div>
+        <div class="subcard">
+          <span class="tag tag-miss">Miss</span>
+          <p>The cache <strong>does not have</strong> the data. Fetch it from the database, store it in the cache, then return it.</p>
+        </div>
+      </section>
+      <p class="backtop"><a href="#top">Back to top ↑</a></p>
+
+      <!-- Section 2 -->
+      <section class="card" id="s2">
+        <h2>
+          <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#7dd3fc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.6-7-11a7 7 0 0 1 14 0c0 5.4-7 11-7 11z"/><circle cx="12" cy="10" r="3"/></svg></span>
+          <span>2. Where to Put the Cache (Placement)</span>
+        </h2>
+        <ul>
+          <li><strong>Client-side cache</strong> — stored on the client.</li>
+          <li><strong>CDN cache</strong> — content cached close to the user.</li>
+          <li><strong>Web server cache</strong> — for example Varnish and Nginx reverse proxy.</li>
+          <li><strong>Database cache</strong> — query cache and buffer pool.</li>
+          <li><strong>Application cache</strong> — in RAM, for example Memcached and Redis.</li>
+        </ul>
+
+        <div class="subcard">
+          <span class="tag tag-example">Example 1</span>
+          <h3>Distributed Cache</h3>
+          <p>Many cache nodes. Each node holds <strong>part</strong> of the data.</p>
+          <p>Total capacity = the <strong>sum</strong> of all nodes. One node down loses <strong>only its part</strong>.</p>
+        </div>
+
+        <div class="subcard">
+          <span class="tag tag-example">Example 2</span>
+          <h3>Global Cache</h3>
+          <p><strong>One shared cache</strong> for all servers — for example, sessions in Redis.</p>
+          <p>Any server can handle the next request. <strong>No sticky server needed.</strong></p>
+        </div>
+
+        <div class="subcard">
+          <span class="tag tag-link">Link — Lesson 5</span>
+          <h3>Lesson 5 Link</h3>
+          <p>Lesson 5 mainly taught <strong>session persistence</strong>: the load balancer uses cookies to send the same client to the same server, because the session lives in that server's memory.</p>
+          <p>The shared-cache idea was only a <strong>modern direction</strong> in Lesson 5 — not its main teaching.</p>
+        </div>
+      </section>
+      <p class="backtop"><a href="#top">Back to top ↑</a></p>
+
+      <!-- Section 3 -->
+      <section class="card" id="s3">
+        <h2>
+          <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#7dd3fc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg></span>
+          <span>3. What to Cache (Granularity)</span>
+        </h2>
+        <div class="subcard">
+          <h3>Query-Level</h3>
+          <p>Cache by the <strong>hash of the query</strong>.</p>
+          <p>Weak point: <strong>invalidation</strong> (removing stale entries) is complex and cascading — one change can affect many cached queries.</p>
+        </div>
+        <div class="subcard">
+          <h3>Object-Level</h3>
+          <p>Cache whole <strong>objects</strong>, for example:</p>
+          <ul>
+            <li>User sessions</li>
+            <li>Rendered pages</li>
+            <li>Activity streams</li>
+            <li>The user graph</li>
+          </ul>
+        </div>
+      </section>
+      <p class="backtop"><a href="#top">Back to top ↑</a></p>
+
+      <!-- Section 4 -->
+      <section class="card" id="s4">
+        <h2>
+          <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#7dd3fc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg></span>
+          <span>4. Four Cache Patterns</span>
+        </h2>
+
+        <div class="subcard">
+          <span class="tag tag-pattern">Pattern 1</span>
+          <h3>Cache-Aside (Lazy Loading)</h3>
+          <p><strong>How:</strong> the app checks the cache first. On a miss, it reads the database and fills the cache.</p>
+          <p><strong>Strengths:</strong> only requested data is cached. The system still works if the cache fails.</p>
+          <p><strong>Weaknesses:</strong> 3 trips on a miss, stale data, and an empty cache after a failure.</p>
+        </div>
+
+        <div class="subcard">
+          <span class="tag tag-pattern">Pattern 2</span>
+          <h3>Write-Through</h3>
+          <p><strong>How:</strong> write to the cache and the database <strong>synchronously</strong> (at the same time).</p>
+          <p><strong>Strength:</strong> no stale data after a write.</p>
+          <p><strong>Weaknesses:</strong> high write latency, most written data is never read, and a new node stays empty until it is updated.</p>
+        </div>
+
+        <div class="subcard">
+          <span class="tag tag-pattern">Pattern 3</span>
+          <h3>Write-Behind (Write-Back)</h3>
+          <p><strong>How:</strong> write to the cache first. Write to the database <strong>asynchronously</strong> (later, in the background).</p>
+          <p><strong>Strengths:</strong> low write latency. Good for write-heavy data.</p>
+          <p><strong>Weaknesses:</strong> data loss if the cache crashes, and higher complexity.</p>
+        </div>
+
+        <div class="subcard">
+          <span class="tag tag-pattern">Pattern 4</span>
+          <h3>Refresh-Ahead</h3>
+          <p><strong>How:</strong> the cache refreshes data <strong>automatically before it expires</strong>.</p>
+          <p><strong>Strength:</strong> very low read latency.</p>
+          <p><strong>Weakness:</strong> bad predictions are worse than no prediction.</p>
+        </div>
+      </section>
+      <p class="backtop"><a href="#top">Back to top ↑</a></p>
+
+      <!-- Quiz -->
+      <section class="card" id="quiz">
+        <h2>
+          <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#7dd3fc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.3A2.6 2.6 0 1 1 12 12.4V14"/><circle cx="12" cy="17.4" r="0.6" fill="#7dd3fc"/></svg></span>
+          <span>Quiz — 10 Questions and Answers</span>
+        </h2>
+        <p>Session 7 only — Sections 1–4.</p>
+
+        <div class="qa">
+          <p class="q-num">Question 1</p>
+          <p class="q-text">You added a cache. Cache-aside or read-through, and why?</p>
+          <div class="answer">
+            <p class="a-label">Answer</p>
+            <p>Cache-aside by default: the app owns the miss logic and still reads the database if the cache fails. Use read-through only when you want the load logic centralised.</p>
+          </div>
+          <p class="source">Source: online interview question.</p>
+        </div>
+
+        <div class="qa">
+          <p class="q-num">Question 2</p>
+          <p class="q-text">On a write, how do you keep the cache and the database consistent?</p>
+          <div class="answer">
+            <p class="a-label">Answer</p>
+            <p>Invalidate the key on write — delete it so the next read reloads it — or use write-through to update both synchronously.</p>
+          </div>
+          <p class="source">Source: online interview question.</p>
+        </div>
+
+        <div class="qa">
+          <p class="q-num">Question 3</p>
+          <p class="q-text">Write-through, write-back, or write-around here?</p>
+          <div class="answer">
+            <p class="a-label">Answer</p>
+            <p>Write-through for data read soon after a write, when consistency is worth the latency. Write-back for speed when losing recent writes is acceptable. Write-around for write-once, rarely-read data.</p>
+          </div>
+          <p class="source">Source: online interview question.</p>
+        </div>
+
+        <div class="qa">
+          <p class="q-num">Question 4</p>
+          <p class="q-text">How would you design a cache strategy like cache-aside, write-through, or write-behind?</p>
+          <div class="answer">
+            <p class="a-label">Answer</p>
+            <p>Cache-aside reads the cache first, reads the database on a miss. Write-through updates both on every write. Write-behind writes the cache now, writes the database later. Choose by freshness need and traffic type.</p>
+          </div>
+          <p class="source">Source: online interview question.</p>
+        </div>
+
+        <div class="qa">
+          <p class="q-num">Question 5</p>
+          <p class="q-text">What is caching? What are the types of caching?</p>
+          <div class="answer">
+            <p class="a-label">Answer</p>
+            <p>Caching stores frequently accessed data in fast storage to reduce latency and database load. Types: in-memory cache (Redis, Memcached), browser cache, CDN cache, and database query cache.</p>
+          </div>
+          <p class="source">Source: online interview question.</p>
+        </div>
+
+        <div class="qa">
+          <p class="q-num">Question 6</p>
+          <p class="q-text">How would you implement caching in a high-traffic API?</p>
+          <div class="answer">
+            <p class="a-label">Answer</p>
+            <p>Use cache-aside with Redis. The app checks the cache first, reads the database on a miss, and fills the cache.</p>
+          </div>
+          <p class="source">Source: online interview question.</p>
+        </div>
+
+        <div class="qa">
+          <p class="q-num">Question 7</p>
+          <p class="q-text">The database is getting hammered. How do you fix it?</p>
+          <div class="answer">
+            <p class="a-label">Answer</p>
+            <p>Add a Redis cache with cache-aside for reads. Cache the read-heavy data and reduce the database load.</p>
+          </div>
+          <p class="source">Source: online interview question.</p>
+        </div>
+
+        <div class="qa">
+          <p class="q-num">Question 8</p>
+          <p class="q-text">What happens if Redis goes down? What happens if the cache fails?</p>
+          <div class="answer">
+            <p class="a-label">Answer</p>
+            <p>With cache-aside, reads fall through to the database. It is slower, but there is no data loss and the system still works.</p>
+          </div>
+          <p class="source">Source: online interview question.</p>
+        </div>
+
+        <div class="qa">
+          <p class="q-num">Question 9</p>
+          <p class="q-text">A user updated their profile but still sees old data. Why, and how do you fix it?</p>
+          <div class="answer">
+            <p class="a-label">Answer</p>
+            <p>The cached profile is stale. Fix it by invalidating that user's cache entry on update, so the next read loads fresh data from the database.</p>
+          </div>
+          <p class="source">Source: online interview question.</p>
+        </div>
+
+        <div class="qa">
+          <p class="q-num">Question 10</p>
+          <p class="q-text">Distributed cache vs Global cache?</p>
+          <div class="answer">
+            <p class="a-label">Answer</p>
+            <p>Distributed: many nodes, each holds part, total capacity is the sum, one node down loses only its part. Global: one shared cache for all servers — for example, sessions in Redis — any server can serve the next request.</p>
+          </div>
+          <p class="source source-practice">Practice — lesson-based question, not an online interview question.</p>
+        </div>
+      </section>
+      <p class="backtop"><a href="#top">Back to top ↑</a></p>
+
+      <!-- Keywords -->
+      <section class="card" id="keywords">
+        <h2>
+          <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#7dd3fc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5v14z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg></span>
+          <span>Keywords</span>
+        </h2>
+
+        <div class="kw-group">
+          <h3>1. What Is Cache?</h3>
+          <p class="kw-list">Cache · Previously computed results · Absorbs reads · Database load · Latency · Hit · Miss</p>
+        </div>
+
+        <div class="kw-group">
+          <h3>2. Placement</h3>
+          <p class="kw-list">Client-side cache · CDN cache · Web server cache · Reverse proxy · Varnish · Nginx · Database cache · Query cache · Buffer pool · Application cache · In RAM · Memcached · Redis · Distributed cache · Global cache · Shared cache · Sticky server · Session persistence · Load balancer · Cookie · Session</p>
+        </div>
+
+        <div class="kw-group">
+          <h3>3. Granularity</h3>
+          <p class="kw-list">Query-level · Hash of the query · Invalidation · Cascading · Object-level · User session · Rendered page · Activity stream · User graph</p>
+        </div>
+
+        <div class="kw-group">
+          <h3>4. Four Patterns</h3>
+          <p class="kw-list">Cache-aside · Lazy loading · Write-through · Synchronous · Write-behind · Write-back · Asynchronous · Refresh-ahead · Stale data · Write latency · Read latency · Consistency · Write-heavy</p>
+        </div>
+      </section>
+      <p class="backtop"><a href="#top">Back to top ↑</a></p>
+
+      <!-- Next session -->
+      <section class="next-box" id="next">
+        <h2>Next — Session 8</h2>
+        <p>Names only — not taught yet:</p>
+        <ul>
+          <li>Comparison (summary of Section 4)</li>
+          <li>TTL / Stale Data</li>
+          <li>Eviction</li>
+          <li>Overall Disadvantages</li>
+          <li>End-of-lesson English Quiz</li>
+        </ul>
+      </section>
+      <p class="backtop"><a href="#top">Back to top ↑</a></p>
+
+    </main>
+  </body>
+</html>
