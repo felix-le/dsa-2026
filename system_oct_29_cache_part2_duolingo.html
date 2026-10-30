@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="dark" />
+<link rel="icon" href="data:," />
+<title>System Design Buổi 8 — Cache (phần mới)</title>
+<style>
+  * { box-sizing: border-box; }
+  html { scroll-behavior: auto; }
+  body {
+    margin: 0;
+    background: #000000;
+    color: #ffffff;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 21px;
+    line-height: 1.8;
+    padding: 28px 18px 64px;
+  }
+  main { width: 100%; max-width: none; margin: 0; }
+  h1 {
+    font-size: 34px;
+    line-height: 1.3;
+    margin: 0 0 10px;
+    letter-spacing: 0.01em;
+  }
+  h2 {
+    font-size: 27px;
+    line-height: 1.35;
+    margin: 0 0 14px;
+  }
+  h3 {
+    font-size: 23px;
+    line-height: 1.4;
+    margin: 22px 0 8px;
+  }
+  p { margin: 0 0 14px; }
+  a { color: #7cc7ff; text-decoration: underline; text-underline-offset: 3px; }
+  a:hover { color: #aee1ff; }
+  code, .mono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 19px;
+    background: #1c1c1c;
+    padding: 1px 6px;
+    border-radius: 4px;
+    word-break: break-word;
+  }
+  .subtitle {
+    font-size: 21px;
+    color: #e8e8e8;
+    margin-bottom: 8px;
+  }
+  .card {
+    background: #111111;
+    border: 1px solid #333333;
+    border-radius: 10px;
+    padding: 26px 24px 20px;
+    margin: 0 0 26px;
+  }
+  .toc-card { padding: 22px 24px 14px; }
+  .toc-list { margin: 0; padding-left: 22px; }
+  .toc-list li { margin-bottom: 6px; }
+  .backtop {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid #2c2c2c;
+    font-size: 19px;
+  }
+  .note-box {
+    background: #1d1a08;
+    border: 1px solid #8a6d1a;
+    border-radius: 8px;
+    padding: 18px 20px 6px;
+    margin: 14px 0 6px;
+  }
+  .note-box-blue {
+    background: #0d1b26;
+    border: 1px solid #2f5f7f;
+    border-radius: 8px;
+    padding: 18px 20px 6px;
+    margin: 14px 0 6px;
+  }
+  ul.plain { margin: 0 0 14px; padding-left: 24px; }
+  ul.plain li { margin-bottom: 10px; }
+  hr.sep { border: none; border-top: 1px solid #2c2c2c; margin: 20px 0; }
+  /* Section icon */
+  .sec-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px; height: 46px;
+    border: 1px solid #444444;
+    border-radius: 8px;
+    background: #1a1a1a;
+    vertical-align: -12px;
+    margin-right: 12px;
+  }
+  .sec-icon svg { width: 26px; height: 26px; }
+  /* Example blocks */
+  .example {
+    background: #161616;
+    border: 1px solid #2c2c2c;
+    border-radius: 8px;
+    padding: 18px 20px 8px;
+    margin: 16px 0;
+  }
+  .example h3 { margin-top: 0; }
+  .flow-label {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    letter-spacing: 0.1em;
+    color: #ffd23f;
+  }
+  /* Pros / cons */
+  .proscons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 12px 0 14px;
+  }
+  .pros, .cons {
+    flex: 1 1 260px;
+    border-radius: 8px;
+    padding: 14px 18px 4px;
+    font-size: 20px;
+  }
+  .pros { background: #0c1f12; border: 1px solid #2e9e4f; }
+  .cons { background: #2a100d; border: 1px solid #b03a2e; }
+  .pros .pc-head { color: #a7e8bc; font-weight: bold; }
+  .cons .pc-head { color: #f0a49c; font-weight: bold; }
+  .pros ul, .cons ul { margin: 6px 0 10px; padding-left: 22px; }
+  .pros li, .cons li { margin-bottom: 6px; }
+  /* Diagram */
+  .diagram {
+    background: #0a0a0a;
+    border: 1px solid #333333;
+    border-radius: 8px;
+    padding: 20px 16px 12px;
+    margin: 18px 0 8px;
+  }
+  .diagram .cap {
+    font-size: 19px;
+    color: #cccccc;
+    margin-top: 12px;
+  }
+  .flow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 10px;
+    margin: 10px 0;
+  }
+  .node {
+    background: #1a1a1a;
+    border: 1px solid #555555;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 19px;
+    text-align: center;
+  }
+  .node.cache { border-color: #2f5f7f; background: #0d1b26; }
+  .node.db { border-color: #8a6d1a; background: #1d1a08; }
+  .node.bad { border-color: #b03a2e; background: #2a100d; }
+  .node small { display: block; font-size: 16px; color: #bbbbbb; line-height: 1.5; }
+  .arrow { color: #7cc7ff; font-size: 22px; font-weight: bold; }
+  .arrow.down { display: block; text-align: center; width: 100%; }
+  .step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: #2f5f7f;
+    color: #ffffff;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    flex: 0 0 auto;
+  }
+  .timeline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    margin: 12px 0;
+    border: 1px solid #444444;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .tl-seg { flex: 1 1 150px; padding: 10px 14px; font-size: 19px; }
+  .tl-fresh { background: #0c1f12; }
+  .tl-old { background: #1d1a08; }
+  .tl-dead { background: #2a100d; }
+  .tl-seg strong { display: block; font-size: 18px; }
+  @media (max-width: 560px) {
+    body { font-size: 20px; padding: 20px 12px 52px; }
+    h1 { font-size: 29px; }
+    .card { padding: 20px 16px 16px; }
+    .pros, .cons { flex-basis: 100%; }
+  }
+</style>
+</head>
+<body id="top">
+<main>
+
+  <h1>System Design — Buổi 8: Lesson 7 Cache (Phần mới)</h1>
+  <p class="subtitle">Tiếp nối Buổi 7 (Mục 1–4: cache là gì, cache đặt ở đâu, mức chi tiết dữ liệu, 4 pattern). Buổi 8 học phần còn lại của bài Cache trong system-design-primer: so sánh 4 pattern, TTL và dữ liệu cũ, chính sách đuổi, và nhược điểm của cache.</p>
+
+  <div class="card toc-card">
+    <h2>Mục lục (Contents)</h2>
+    <ol class="toc-list">
+      <li><a href="#s1">Mục 1 — So sánh 4 pattern (Pattern comparison)</a></li>
+      <li><a href="#s2">Mục 2 — TTL và stale data (TTL and stale data)</a></li>
+      <li><a href="#s3">Mục 3 — Eviction policies (Chính sách đuổi)</a></li>
+      <li><a href="#s4">Mục 4 — Disadvantages (Nhược điểm của cache)</a></li>
+      <li><a href="#english">English version — copy into your notebook</a></li>
+      <li><a href="#keywords">Keywords (Từ khóa)</a></li>
+    </ol>
+  </div>
+
+  <!-- SECTION 1 -->
+  <section class="card" id="s1">
+    <h2><span class="sec-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#7cc7ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v18"/><path d="M16 3v18"/><path d="M3 8h5"/><path d="M3 16h5"/><path d="M16 8h5"/><path d="M16 16h5"/></svg></span>Mục 1 — So sánh 4 pattern (Pattern comparison)</h2>
+
+    <div class="note-box">
+      <p><strong>Lưu ý trước:</strong> mục này là bản <strong>tóm tắt so sánh</strong> (comparison summary) của <strong>Mục 4 Buổi 7</strong> — không phải nội dung mới hoàn toàn. Buổi 7 đã giới thiệu từng mẫu truy cập cache (cache access pattern); buổi này đặt cả 4 pattern cạnh nhau để so sánh luồng đọc / ghi (read / write flow) và ưu / nhược điểm (pros / cons) của từng pattern.</p>
+    </div>
+
+    <div class="note-box-blue">
+      <p><strong>Liên hệ Buổi 7 — Mục 4:</strong> 4 pattern truy cập cache. Nội dung chính của mục đó: cách ứng dụng (application — app) đọc và ghi dữ liệu thông qua cache — cache-aside, write-through, write-behind, refresh-ahead. Mục này không dạy lại từ đầu, chỉ so sánh chúng với nhau.</p>
+    </div>
+
+    <div class="example">
+      <h3>Ví dụ 1.1 — Cache-aside (lazy loading — nạp lười)</h3>
+      <p><span class="flow-label">ĐỌC (READ)</span></p>
+      <p>App kiểm tra cache trước. Nếu trúng (hit) thì trả về ngay. Nếu trượt (miss) thì app đọc cơ sở dữ liệu (database — DB), điền (populate) dữ liệu vào cache, rồi mới trả về.</p>
+      <p><span class="flow-label">GHI (WRITE)</span></p>
+      <p>App ghi thẳng xuống DB, rồi xóa (invalidate) hoặc cập nhật entry tương ứng trong cache.</p>
+      <div class="proscons">
+        <div class="pros">
+          <span class="pc-head">Ưu điểm (Pros)</span>
+          <ul>
+            <li>Đơn giản (simple), dễ triển khai.</li>
+            <li>Chỉ cache dữ liệu thật sự được đọc — không tốn bộ nhớ cho dữ liệu không ai dùng.</li>
+          </ul>
+        </div>
+        <div class="cons">
+          <span class="pc-head">Nhược điểm (Cons)</span>
+          <ul>
+            <li>Mỗi lần miss tốn 3 chuyến (3 trips): cache → DB → cache.</li>
+            <li>Dữ liệu trong cache có thể cũ (stale).</li>
+            <li>Node cache mới bắt đầu trống rỗng (empty).</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="example">
+      <h3>Ví dụ 1.2 — Write-through (ghi xuyên qua)</h3>
+      <p><span class="flow-label">GHI (WRITE)</span></p>
+      <p>Mỗi lần ghi, app ghi đồng thời (synchronously) vào cả cache và DB, rồi mới trả về kết quả.</p>
+      <p><span class="flow-label">ĐỌC (READ)</span></p>
+      <p>Đọc từ cache như bình thường. Vì mọi lần ghi đều đi qua cache, dữ liệu trong cache luôn khớp với DB.</p>
+      <div class="proscons">
+        <div class="pros">
+          <span class="pc-head">Ưu điểm (Pros)</span>
+          <ul>
+            <li>Cache luôn mới (fresh) — dữ liệu trong cache luôn khớp DB.</li>
+          </ul>
+        </div>
+        <div class="cons">
+          <span class="pc-head">Nhược điểm (Cons)</span>
+          <ul>
+            <li>Ghi chậm hơn, vì phải ghi xong cả 2 nơi mới trả về.</li>
+            <li>Cache cả dữ liệu không ai đọc — tốn bộ nhớ vô ích.</li>
+            <li>Node mới vẫn trống cho đến khi có lần cập nhật (update) đầu tiên ghi qua nó.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="example">
+      <h3>Ví dụ 1.3 — Write-behind / Write-back (ghi sau)</h3>
+      <p><span class="flow-label">GHI (WRITE)</span></p>
+      <p>App ghi vào cache rồi trả về ngay. Việc ghi xuống DB diễn ra bất đồng bộ (asynchronously) về sau, do cache tự lo.</p>
+      <p><span class="flow-label">ĐỌC (READ)</span></p>
+      <p>Đọc từ cache — và vì ghi cũng vào cache trước, lần đọc ngay sau lần ghi thấy dữ liệu mới nhất trong cache.</p>
+      <div class="proscons">
+        <div class="pros">
+          <span class="pc-head">Ưu điểm (Pros)</span>
+          <ul>
+            <li>Ghi rất nhanh — người dùng không phải chờ DB.</li>
+          </ul>
+        </div>
+        <div class="cons">
+          <span class="pc-head">Nhược điểm (Cons)</span>
+          <ul>
+            <li>Mất dữ liệu (data loss) nếu cache sập (crash) trước khi kịp ghi xuống DB.</li>
+            <li>Triển khai (implementation) phức tạp.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="example">
+      <h3>Ví dụ 1.4 — Refresh-ahead (làm mới trước)</h3>
+      <p><span class="flow-label">ĐỌC (READ)</span></p>
+      <p>Cache tự làm mới (refresh) các mục dữ liệu (entry) vừa được đọc, ngay trước khi chúng hết hạn (expire). Người đọc tiếp theo nhận ngay bản mới từ cache.</p>
+      <p><span class="flow-label">GHI (WRITE)</span></p>
+      <p>Luồng ghi không đổi — điểm khác biệt của pattern này nằm ở phía đọc: việc nạp lại dữ liệu được làm trước, không đợi tới lúc có người đọc bị miss.</p>
+      <div class="proscons">
+        <div class="pros">
+          <span class="pc-head">Ưu điểm (Pros)</span>
+          <ul>
+            <li>Giảm độ trễ (latency) khi đọc — ít người đọc phải chịu cảnh miss rồi chờ DB.</li>
+          </ul>
+        </div>
+        <div class="cons">
+          <span class="pc-head">Nhược điểm (Cons)</span>
+          <ul>
+            <li>Nếu dự đoán (prediction) sai — làm mới thứ không ai đọc nữa — thì còn tệ hơn không làm: tốn công và tốn tài nguyên vô ích.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="diagram" role="img" aria-label="Sơ đồ: luồng đọc kiểm tra cache trước; luồng ghi thì thứ tự cache và DB tùy thuộc vào pattern đã chọn">
+      <p style="margin:0 0 6px;"><strong>Sơ đồ 1 — Đọc và ghi đi hai đường khác nhau</strong></p>
+      <p style="margin:0;"><span class="flow-label">ĐỌC (READ)</span></p>
+      <div class="flow">
+        <span class="node">App</span>
+        <span class="arrow">→</span>
+        <span class="node cache">Cache<small>kiểm tra trước</small></span>
+        <span class="arrow">→ miss →</span>
+        <span class="node db">Database<small>chỉ xuống DB khi miss</small></span>
+      </div>
+      <p style="margin:10px 0 0;"><span class="flow-label">GHI (WRITE) — THỨ TỰ DO PATTERN QUYẾT ĐỊNH</span></p>
+      <div class="flow">
+        <span class="node">Cache-aside<small>ghi DB, xóa cache</small></span>
+        <span class="node">Write-through<small>ghi cache + DB cùng lúc</small></span>
+        <span class="node">Write-behind<small>ghi cache, DB ghi sau</small></span>
+        <span class="node">Refresh-ahead<small>làm mới trước khi hết hạn</small></span>
+      </div>
+      <p class="cap">Ý chính cần nhớ: cả 4 pattern giống nhau ở phía đọc (cache đứng trước DB); chúng khác nhau ở <strong>thời điểm ghi xuống DB</strong> và <strong>ai chủ động nạp dữ liệu vào cache</strong>.</p>
+    </div>
+
+    <div class="backtop"><a href="#top">↑ Back to top</a></div>
+  </section>
+
+  <!-- SECTION 2 -->
+  <section class="card" id="s2">
+    <h2><span class="sec-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#ffd23f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span>Mục 2 — TTL và stale data (TTL and stale data)</h2>
+
+    <div class="note-box-blue">
+      <p><strong>Liên hệ Buổi 7 — Mục 1:</strong> cache là gì. Nội dung chính của mục đó: cache là một lớp lưu trữ nhanh nằm trước DB, giữ bản sao (copy) của dữ liệu để lần đọc sau không phải xuống DB. Vì dữ liệu trong cache chỉ là <strong>bản sao</strong>, nó có thể cũ hơn bản gốc trong DB — đó chính là gốc rễ của stale data trong mục này.</p>
+    </div>
+
+    <h3>TTL (time-to-live — thời gian sống)</h3>
+    <p>TTL là thời gian sống của một entry trong cache. Khi hết TTL, entry đó coi như miss: lần đọc tiếp theo phải xuống DB lấy lại bản mới nhất, rồi điền lại vào cache với một TTL mới.</p>
+
+    <h3>Stale data (dữ liệu cũ)</h3>
+    <p>Stale data là tình trạng cache trả về dữ liệu cũ hơn dữ liệu thật trong DB. Nguyên nhân: DB đã được cập nhật, nhưng bản sao trong cache chưa đổi — cache vẫn đang giữ bản cũ và vẫn trả nó cho người đọc.</p>
+
+    <h3>Cách chọn TTL</h3>
+    <ul class="plain">
+      <li>Dữ liệu thay đổi nhanh (highly dynamic data) → đặt TTL ngắn (short TTL): chấp nhận xuống DB thường xuyên hơn để dữ liệu không bị cũ lâu.</li>
+      <li>Dữ liệu ít thay đổi (rarely changing data) → đặt TTL dài (long TTL) được: bản sao trong cache gần như luôn đúng, ít cần nạp lại.</li>
+    </ul>
+
+    <div class="example">
+      <h3>Ví dụ 2.1 — TTL ngắn cho dữ liệu đổi nhanh</h3>
+      <p>Giá sản phẩm (product price) trên một trang bán hàng thay đổi liên tục trong ngày. Nếu đặt TTL dài, khách sẽ thấy giá cũ (stale price) rất lâu sau khi giá thật đã đổi. Vì vậy loại dữ liệu này đặt TTL ngắn — chỉ vài giây tới vài phút — để giá trong cache nhanh chóng được làm mới từ DB.</p>
+    </div>
+
+    <div class="example">
+      <h3>Ví dụ 2.2 — TTL dài cho dữ liệu ít đổi</h3>
+      <p>Danh sách quốc gia (country list) dùng trong form đăng ký gần như không bao giờ thay đổi. Loại dữ liệu này đặt TTL dài — hàng giờ, thậm chí hàng ngày — vẫn an toàn, vì bản sao trong cache hầu như luôn khớp với DB.</p>
+    </div>
+
+    <div class="diagram" role="img" aria-label="Sơ đồ vòng đời của một entry: được ghi vào cache, còn mới trong thời gian TTL, hết TTL thì coi như miss và lần đọc sau phải xuống DB lấy lại">
+      <p style="margin:0 0 6px;"><strong>Sơ đồ 2 — Vòng đời (lifecycle) của một entry theo TTL</strong></p>
+      <div class="timeline">
+        <div class="tl-seg tl-fresh"><strong>① Mới (fresh)</strong>Entry vừa được nạp từ DB. Đọc trúng cache, dữ liệu mới.</div>
+        <div class="tl-seg tl-old"><strong>② Đang sống (within TTL)</strong>DB có thể đã đổi → bản trong cache có nguy cơ thành stale data.</div>
+        <div class="tl-seg tl-dead"><strong>③ Hết TTL (expired)</strong>Entry coi như miss. Lần đọc sau xuống DB lấy bản mới.</div>
+      </div>
+      <p class="cap">Ý chính cần nhớ: TTL là cách đơn giản nhất để giới hạn độ cũ của dữ liệu — dữ liệu đổi càng nhanh, TTL càng phải ngắn.</p>
+    </div>
+
+    <div class="backtop"><a href="#top">↑ Back to top</a></div>
+  </section>
+
+  <!-- SECTION 3 -->
+  <section class="card" id="s3">
+    <h2><span class="sec-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#f0a49c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h13"/><path d="M3 12h13"/><path d="M3 18h9"/><path d="M18 9l3 3-3 3"/><path d="M21 12H11"/></svg></span>Mục 3 — Eviction policies (Chính sách đuổi)</h2>
+
+    <div class="note-box-blue">
+      <p><strong>Liên hệ Buổi 7 — Mục 2:</strong> cache đặt ở đâu (cache placement). Nội dung chính của mục đó: cache sống trong bộ nhớ (memory — RAM), nhanh nhưng dung lượng (capacity) nhỏ và đắt hơn ổ đĩa rất nhiều. Vì bộ nhớ có hạn nên cache sớm muộn cũng đầy — và đó là lý do hệ thống cần chính sách đuổi ở mục này.</p>
+    </div>
+
+    <h3>Vấn đề: cache đầy thì sao?</h3>
+    <p>Khi cache đã đầy (full), muốn thêm một entry mới thì bắt buộc phải đuổi (evict) một entry cũ ra để lấy chỗ. Câu hỏi là: <strong>đuổi entry nào?</strong> Chính sách đuổi (eviction policy) là quy tắc trả lời câu hỏi đó.</p>
+
+    <h3>6 chính sách đuổi (6 eviction policies)</h3>
+    <ul class="plain">
+      <li><strong>FIFO (first in first out — vào trước ra trước):</strong> đuổi entry được đưa vào cache sớm nhất.</li>
+      <li><strong>LIFO (last in first out — vào sau ra trước):</strong> đuổi entry được đưa vào cache gần đây nhất.</li>
+      <li><strong>LRU (least recently used — ít được dùng gần đây nhất):</strong> đuổi entry lâu nhất không được ai đọc tới.</li>
+      <li><strong>MRU (most recently used — được dùng gần đây nhất):</strong> đuổi entry vừa mới được dùng xong.</li>
+      <li><strong>LFU (least frequently used — ít được dùng thường xuyên nhất):</strong> đuổi entry có tổng số lần được dùng ít nhất.</li>
+      <li><strong>Random (ngẫu nhiên):</strong> đuổi một entry bất kỳ, chọn ngẫu nhiên.</li>
+    </ul>
+
+    <div class="example">
+      <h3>Ví dụ 3.1 — LRU đuổi entry "lâu không ai đụng tới"</h3>
+      <p>Cache đang giữ 3 entry: A, B, C. Thứ tự được đọc gần đây: A được đọc 1 phút trước, B được đọc 10 phút trước, C đã 1 giờ không ai đọc. Cache đầy, entry D mới cần vào chỗ. Theo LRU, C bị đuổi — vì C là entry lâu nhất không được dùng (least recently used), khả năng sắp tới có người cần C là thấp nhất trong ba entry.</p>
+      <p>Ngược lại, theo MRU thì A mới là entry bị đuổi, vì A vừa được dùng gần nhất (most recently used) — cách này hợp khi dữ liệu vừa dùng xong thì ít có khả năng được dùng lại ngay, ví dụ quét (scan) qua một danh sách dài một lần duy nhất.</p>
+    </div>
+
+    <div class="diagram" role="img" aria-label="Sơ đồ: cache đã đầy gồm A, B, C; entry mới D cần vào, nên entry C lâu nhất không được dùng bị đuổi ra theo LRU">
+      <p style="margin:0 0 6px;"><strong>Sơ đồ 3 — Một lần đuổi (eviction) theo LRU</strong></p>
+      <div class="flow">
+        <span class="step-num">1</span>
+        <span class="node cache">Cache đầy (full)<small>A · B · C — không còn chỗ trống</small></span>
+        <span class="arrow">→</span>
+        <span class="step-num">2</span>
+        <span class="node">Entry D mới<small>cần một chỗ trong cache</small></span>
+      </div>
+      <div class="flow">
+        <span class="step-num">3</span>
+        <span class="node bad">C bị đuổi (evicted)<small>lâu nhất không được dùng — LRU</small></span>
+        <span class="arrow">→</span>
+        <span class="step-num">4</span>
+        <span class="node cache">Cache mới<small>A · B · D</small></span>
+      </div>
+      <p class="cap">Ý chính cần nhớ: cache không bao giờ chứa được mọi thứ. Chọn chính sách đuổi tức là chọn <strong>hy sinh entry nào</strong> — dựa trên thời gian vào (FIFO / LIFO), lần dùng gần nhất (LRU / MRU), số lần dùng (LFU), hoặc không dựa vào gì cả (Random).</p>
+    </div>
+
+    <div class="backtop"><a href="#top">↑ Back to top</a></div>
+  </section>
+
+  <!-- SECTION 4 -->
+  <section class="card" id="s4">
+    <h2><span class="sec-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#b03a2e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3L2 20h20L12 3z"/><path d="M12 10v4"/><path d="M12 17.5v.5"/></svg></span>Mục 4 — Disadvantages (Nhược điểm của cache)</h2>
+
+    <div class="note-box-blue">
+      <p><strong>Liên hệ Buổi 7 — Mục 2 và Lesson 5:</strong> Buổi 7 Mục 2 đã học global cache (cache toàn cục) — một Redis dùng chung cho mọi app server — đặt cạnh local cache (cache cục bộ) trong từng server. Lesson 5 đã học về load balancer (bộ cân bằng tải) và ý tưởng không để một thành phần nào thành điểm chết duy nhất. Mục này nối hai ý đó lại: chính global cache, nếu không có HA, sẽ thành điểm chết duy nhất của cả hệ thống.</p>
+    </div>
+
+    <ul class="plain">
+      <li><strong>Stale data (dữ liệu cũ):</strong> cache có thể lệch với DB. Đây là nhược điểm gốc: cache là bản sao, và bản sao thì luôn có nguy cơ không khớp bản gốc (xem lại Mục 2 của buổi này).</li>
+      <li><strong>Cold start (khởi động lạnh):</strong> một node cache mới bắt đầu trống rỗng. Hàng loạt request đầu tiên đều miss, tất cả cùng dồn xuống DB cùng lúc → DB bị quá tải (overloaded) đúng vào lúc hệ thống đang yếu nhất.</li>
+      <li><strong>Tốn bộ nhớ và chi phí (memory and cost):</strong> cache sống trong RAM — loại bộ nhớ đắt nhất. Giữ càng nhiều dữ liệu trong cache, hóa đơn càng lớn.</li>
+      <li><strong>Thêm độ phức tạp (complexity) cho hệ thống:</strong> có cache là phải lo thêm hai việc khó: invalidation (việc xóa / làm mất hiệu lực dữ liệu cũ trong cache) và consistency (tính nhất quán — đảm bảo cache và DB không mâu thuẫn nhau).</li>
+      <li><strong>Global cache có thể thành điểm chết duy nhất:</strong> nếu toàn bộ app server dùng chung 1 Redis (global cache) mà Redis đó không có HA (high availability — tính sẵn sàng cao, tức là có bản dự phòng tự động thay thế khi bản chính chết), thì Redis chết = mọi server mất cache cùng lúc = toàn bộ request dồn xuống DB. Một thành phần như vậy gọi là single point of failure (điểm chết duy nhất).</li>
+    </ul>
+
+    <div class="example">
+      <h3>Ví dụ 4.1 — Cold start làm DB quá tải</h3>
+      <p>Một node cache mới được thêm vào hệ thống lúc giờ cao điểm. Node này trống rỗng, nên mọi request được chuyển tới nó đều miss và đi tiếp xuống DB. DB bình thường chỉ phải gánh số ít request bị miss; giờ đột nhiên phải gánh gần như toàn bộ — và có thể sập vì quá tải, dù bản thân DB không hề có lỗi.</p>
+    </div>
+
+    <div class="example">
+      <h3>Ví dụ 4.2 — 1 Redis chung chết, cả hệ thống mất cache</h3>
+      <p>Ba app server cùng dùng chung một Redis làm global cache, và Redis này không có bản dự phòng (no HA). Khi Redis chết, cả ba server mất cache trong cùng một khoảnh khắc. Mọi request đều miss và dồn xuống DB — đúng kịch bản quá tải của Ví dụ 4.1, nhưng xảy ra trên toàn hệ thống cùng lúc. Đây là single point of failure: một thành phần chết kéo theo cả hệ thống. Bài Load Balancer (Lesson 5) đã dạy nguyên tắc tránh điểm chết duy nhất cho tầng server; nguyên tắc đó áp dụng y hệt cho tầng cache.</p>
+    </div>
+
+    <div class="diagram" role="img" aria-label="Sơ đồ: ba app server dùng chung một Redis không có dự phòng; Redis là điểm chết duy nhất, chết thì mọi request dồn xuống database">
+      <p style="margin:0 0 6px;"><strong>Sơ đồ 4 — Global cache không có HA = điểm chết duy nhất</strong></p>
+      <div class="flow">
+        <span class="node">App server 1</span>
+        <span class="node">App server 2</span>
+        <span class="node">App server 3</span>
+      </div>
+      <span class="arrow down">↓ ↓ ↓ &nbsp;tất cả dùng chung&nbsp; ↓ ↓ ↓</span>
+      <div class="flow">
+        <span class="node bad">1 Redis chung (global cache)<small>KHÔNG có HA → single point of failure</small></span>
+      </div>
+      <span class="arrow down">↓ &nbsp;Redis chết → mọi request đều miss&nbsp; ↓</span>
+      <div class="flow">
+        <span class="node db">Database<small>bị quá tải vì gánh toàn bộ request</small></span>
+      </div>
+      <p class="cap">Ý chính cần nhớ: cache giúp hệ thống nhanh hơn, nhưng cái giá là stale data, cold start, tốn bộ nhớ, thêm độ phức tạp — và nếu đặt cache dùng chung mà không có HA, chính cache trở thành điểm chết duy nhất.</p>
+    </div>
+
+    <div class="backtop"><a href="#top">↑ Back to top</a></div>
+  </section>
+
+  <!-- ENGLISH VERSION -->
+  <section class="card" id="english" lang="en">
+    <h2>English version — copy into your notebook</h2>
+    <p>A 100% English version of all four sections above, for copying into your notebook.</p>
+
+    <hr class="sep" />
+    <h3>Section 1 — Pattern comparison</h3>
+    <p><strong>Note:</strong> this section is a comparison summary of Buổi 7, Section 4 — it is not entirely new content. Buổi 7 introduced each cache access pattern; this section puts all four side by side and compares their read / write flows and pros / cons.</p>
+
+    <p><strong>Example 1.1 — Cache-aside (lazy loading).</strong><br />
+    Read flow: the application checks the cache first. On a hit, it returns the data right away. On a miss, it reads the database, populates the cache, and then returns the data.<br />
+    Write flow: the application writes directly to the database, then invalidates or updates the matching entry in the cache.<br />
+    Pros: simple; only data that is actually read gets cached, so no memory is wasted on data nobody uses.<br />
+    Cons: every miss costs 3 trips (cache → DB → cache); the data in the cache can be stale; a new cache node starts empty.</p>
+
+    <p><strong>Example 1.2 — Write-through.</strong><br />
+    Write flow: on every write, the application writes to the cache and the database at the same time (synchronously), and only then returns.<br />
+    Read flow: reads come from the cache as usual. Because every write goes through the cache, the data in the cache always matches the database.<br />
+    Pros: the cache is always fresh — the cached data always matches the database.<br />
+    Cons: writes are slower, because both stores must be written before returning; data that nobody reads is cached too, wasting memory; a new node stays empty until the first update is written through it.</p>
+
+    <p><strong>Example 1.3 — Write-behind / write-back.</strong><br />
+    Write flow: the application writes to the cache and returns immediately. The database is written asynchronously later, by the cache itself.<br />
+    Read flow: reads come from the cache — and because writes also land in the cache first, a read right after a write sees the newest data in the cache.<br />
+    Pros: writes are very fast — the user never waits for the database.<br />
+    Cons: data loss if the cache crashes before it writes to the database; the implementation is complex.</p>
+
+    <p><strong>Example 1.4 — Refresh-ahead.</strong><br />
+    Read flow: the cache automatically refreshes entries that were recently read, just before they expire. The next reader gets the fresh copy from the cache right away.<br />
+    Write flow: unchanged — what makes this pattern different is the read side: reloading the data happens ahead of time, instead of waiting for a reader to miss.<br />
+    Pros: lower latency on reads — fewer readers suffer a miss and have to wait for the database.<br />
+    Cons: if the prediction is wrong — refreshing data that nobody reads again — it is worse than doing nothing: the work and the resources are wasted.</p>
+
+    <p><strong>Diagram 1 — the key idea:</strong> all four patterns look the same on the read side (the cache stands in front of the database). They differ in <em>when the database is written</em> and in <em>who loads data into the cache</em>.</p>
+
+    <hr class="sep" />
+    <h3>Section 2 — TTL and stale data</h3>
+    <p><strong>TTL (time-to-live)</strong> is how long an entry lives in the cache. When the TTL runs out, the entry counts as a miss: the next read must go down to the database, fetch the newest data, and fill the cache again with a new TTL.</p>
+    <p><strong>Stale data</strong> is when the cache returns data that is older than the real data in the database. The cause: the database was updated, but the copy in the cache was not — the cache still holds the old copy and keeps serving it to readers.</p>
+    <p><strong>How to choose a TTL:</strong> highly dynamic data (data that changes fast) → use a short TTL, accepting more trips to the database so the data never stays old for long. Rarely changing data → a long TTL is fine, because the copy in the cache almost always matches the database.</p>
+    <p><strong>Example 2.1 — short TTL for fast-changing data.</strong> A product price on a shopping page changes many times a day. With a long TTL, customers would keep seeing a stale price long after the real price changed. So this kind of data gets a short TTL — a few seconds to a few minutes — so the cached price is refreshed from the database quickly.</p>
+    <p><strong>Example 2.2 — long TTL for rarely changing data.</strong> The country list in a sign-up form almost never changes. A long TTL — hours, even days — is safe for this kind of data, because the copy in the cache almost always matches the database.</p>
+    <p><strong>Diagram 2 — the key idea:</strong> an entry is fresh when it is loaded, stays within its TTL while the database may drift ahead of it, and counts as expired once the TTL ends. TTL is the simplest way to limit how old cached data can get — the faster the data changes, the shorter the TTL must be.</p>
+
+    <hr class="sep" />
+    <h3>Section 3 — Eviction policies</h3>
+    <p>When the cache is full, adding a new entry means evicting an old one to make room. An eviction policy is the rule that decides <em>which</em> entry gets evicted. A cache lives in memory (RAM), which is fast but small and expensive — that is why the cache fills up and eviction is needed at all.</p>
+    <ul class="plain">
+      <li><strong>FIFO (first in first out):</strong> evict the entry that was added to the cache earliest.</li>
+      <li><strong>LIFO (last in first out):</strong> evict the entry that was added to the cache most recently.</li>
+      <li><strong>LRU (least recently used):</strong> evict the entry that has not been used for the longest time.</li>
+      <li><strong>MRU (most recently used):</strong> evict the entry that was used most recently.</li>
+      <li><strong>LFU (least frequently used):</strong> evict the entry with the lowest total number of uses.</li>
+      <li><strong>Random:</strong> evict a random entry.</li>
+    </ul>
+    <p><strong>Example 3.1 — LRU evicts the entry nobody has touched for the longest time.</strong> The cache holds A, B and C. A was read 1 minute ago, B was read 10 minutes ago, and C has not been read for 1 hour. The cache is full and a new entry D needs a slot. Under LRU, C is evicted — it is the least recently used entry, so it is the least likely of the three to be needed soon. Under MRU, A would be evicted instead, because A was used most recently — that fits workloads where data that was just used is unlikely to be used again right away, for example scanning through a long list exactly once.</p>
+    <p><strong>Diagram 3 — the key idea:</strong> a cache can never hold everything. Choosing an eviction policy means choosing which entry to sacrifice — based on arrival order (FIFO / LIFO), most recent use (LRU / MRU), number of uses (LFU), or nothing at all (Random).</p>
+
+    <hr class="sep" />
+    <h3>Section 4 — Disadvantages of caching</h3>
+    <ul class="plain">
+      <li><strong>Stale data:</strong> the cache can drift away from the database. This is the root disadvantage: a cache is a copy, and a copy can always disagree with the original.</li>
+      <li><strong>Cold start:</strong> a new cache node starts empty. The first wave of requests all miss and hit the database at the same time, so the database gets overloaded exactly when the system is at its weakest.</li>
+      <li><strong>Memory and cost:</strong> a cache lives in RAM — the most expensive kind of memory. The more data you keep in the cache, the bigger the bill.</li>
+      <li><strong>Added complexity:</strong> adding a cache means dealing with two hard problems: invalidation (removing or expiring old data in the cache) and consistency (making sure the cache and the database do not contradict each other).</li>
+      <li><strong>A global cache can become a single point of failure:</strong> if every application server shares one Redis (a global cache) and that Redis has no HA (high availability — a standby copy that automatically takes over when the main one dies), then Redis dying means every server loses its cache at the same moment, and all requests flood the database. Such a component is called a single point of failure.</li>
+    </ul>
+    <p><strong>Example 4.1 — a cold start overloads the database.</strong> A new cache node is added to the system at peak hour. The node is empty, so every request routed to it misses and goes on to the database. The database normally handles only the few requests that miss; now it suddenly has to handle almost all of them — and it can go down from overload, even though the database itself has no bug.</p>
+    <p><strong>Example 4.2 — one shared Redis dies, the whole system loses its cache.</strong> Three application servers share one Redis as a global cache, and that Redis has no standby (no HA). When Redis dies, all three servers lose their cache in the same moment. Every request misses and floods the database — the same overload scenario as Example 4.1, but across the whole system at once. This is a single point of failure: one component dying takes the whole system down with it. The Load Balancer lesson (Lesson 5) taught the principle of avoiding a single point of failure at the server layer; the same principle applies exactly the same way at the cache layer.</p>
+    <p><strong>Diagram 4 — the key idea:</strong> a cache makes the system faster, but the price is stale data, cold starts, memory cost, and extra complexity — and if a shared cache has no HA, the cache itself becomes the single point of failure.</p>
+
+    <div class="backtop"><a href="#top">↑ Back to top</a></div>
+  </section>
+
+  <!-- KEYWORDS -->
+  <section class="card" id="keywords">
+    <h2>Keywords (Từ khóa) — Buổi 8</h2>
+
+    <h3>Mục 1 — Pattern comparison</h3>
+    <ul class="plain">
+      <li>Pattern comparison — so sánh các pattern</li>
+      <li>Cache access pattern — mẫu truy cập cache</li>
+      <li>Read flow / write flow — luồng đọc / luồng ghi</li>
+      <li>Pros / cons — ưu điểm / nhược điểm</li>
+      <li>Cache-aside = lazy loading — nạp lười</li>
+      <li>Hit / miss — trúng / trượt cache</li>
+      <li>Populate the cache — điền dữ liệu vào cache</li>
+      <li>Invalidate — xóa / làm mất hiệu lực entry trong cache</li>
+      <li>Write-through — ghi xuyên qua (cache + DB cùng lúc)</li>
+      <li>Synchronously — đồng thời, đồng bộ</li>
+      <li>Fresh — (dữ liệu) mới, luôn khớp DB</li>
+      <li>Write-behind = write-back — ghi sau</li>
+      <li>Asynchronously — bất đồng bộ</li>
+      <li>Crash — sập (hệ thống / tiến trình chết đột ngột)</li>
+      <li>Data loss — mất dữ liệu</li>
+      <li>Implementation — việc triển khai</li>
+      <li>Refresh-ahead — làm mới trước</li>
+      <li>Expire — hết hạn</li>
+      <li>Latency — độ trễ</li>
+      <li>Prediction — dự đoán</li>
+    </ul>
+
+    <h3>Mục 2 — TTL and stale data</h3>
+    <ul class="plain">
+      <li>TTL = time-to-live — thời gian sống của entry</li>
+      <li>Stale data — dữ liệu cũ (cũ hơn DB thật)</li>
+      <li>Copy — bản sao</li>
+      <li>Highly dynamic data — dữ liệu thay đổi nhanh</li>
+      <li>Rarely changing data — dữ liệu ít thay đổi</li>
+      <li>Short TTL / long TTL — TTL ngắn / TTL dài</li>
+      <li>Lifecycle — vòng đời</li>
+      <li>Expired — đã hết hạn</li>
+    </ul>
+
+    <h3>Mục 3 — Eviction policies</h3>
+    <ul class="plain">
+      <li>Eviction policy — chính sách đuổi</li>
+      <li>Evict — đuổi (một entry ra khỏi cache)</li>
+      <li>Full — (cache) đã đầy</li>
+      <li>Capacity — dung lượng</li>
+      <li>FIFO = first in first out — vào trước ra trước</li>
+      <li>LIFO = last in first out — vào sau ra trước</li>
+      <li>LRU = least recently used — ít được dùng gần đây nhất</li>
+      <li>MRU = most recently used — được dùng gần đây nhất</li>
+      <li>LFU = least frequently used — ít được dùng thường xuyên nhất</li>
+      <li>Random — ngẫu nhiên</li>
+      <li>Scan — quét qua (một danh sách dài)</li>
+    </ul>
+
+    <h3>Mục 4 — Disadvantages</h3>
+    <ul class="plain">
+      <li>Disadvantage — nhược điểm</li>
+      <li>Cold start — khởi động lạnh</li>
+      <li>Overloaded — bị quá tải</li>
+      <li>Memory — bộ nhớ (RAM)</li>
+      <li>Cost — chi phí</li>
+      <li>Complexity — độ phức tạp</li>
+      <li>Invalidation — việc xóa dữ liệu cũ trong cache</li>
+      <li>Consistency — tính nhất quán</li>
+      <li>Global cache — cache toàn cục (dùng chung)</li>
+      <li>Local cache — cache cục bộ (trong từng server)</li>
+      <li>HA = high availability — tính sẵn sàng cao</li>
+      <li>Standby — bản dự phòng chờ thay thế</li>
+      <li>Single point of failure — điểm chết duy nhất</li>
+      <li>Load balancer — bộ cân bằng tải (Lesson 5)</li>
+    </ul>
+
+    <div class="backtop"><a href="#top">↑ Back to top</a></div>
+  </section>
+
+</main>
+</body>
+</html>
