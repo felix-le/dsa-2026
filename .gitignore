@@ -1,0 +1,36 @@
+# Python cache and generated files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Packaging and test artifacts
+.python-version
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Type-checker and linter caches
+.mypy_cache/
+.pyright/
+.ruff_cache/
+
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# macOS
+.DS_Store
+
+# Editors
+.idea/
