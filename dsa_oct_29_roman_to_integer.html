@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <link rel="icon" href="data:," />
+    <title>Roman to Integer — Guided Thinking (via Parallel Pairs)</title>
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: #000;
+        color: #fff;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 21px;
+        line-height: 1.8;
+      }
+      main {
+        width: 100%;
+        padding: 24px 20px 48px;
+      }
+      h1 {
+        font-size: 32px;
+        line-height: 1.4;
+        margin: 0 0 8px;
+      }
+      h2 {
+        font-size: 26px;
+        line-height: 1.5;
+        margin: 0 0 16px;
+      }
+      p { margin: 0 0 14px; }
+      a { color: #6db3f2; }
+      a:visited { color: #6db3f2; }
+      .source-line { margin: 0 0 24px; }
+      .card {
+        background: #111;
+        border: 1px solid #333;
+        border-radius: 10px;
+        padding: 24px 22px;
+        margin: 0 0 28px;
+      }
+      .toc ul, .card ul, .card ol { margin: 0; padding-left: 28px; }
+      .toc li, .card li { margin-bottom: 8px; }
+      .pair {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+      .block {
+        border-radius: 10px;
+        padding: 20px;
+        background: #0a0a0a;
+      }
+      .block-de {
+        border: 2px solid #2f6fb2;
+      }
+      .block-tu-duy {
+        border: 2px solid #c98a12;
+      }
+      .block-label {
+        font-size: 17px;
+        letter-spacing: 2px;
+        margin: 0 0 12px;
+        font-weight: bold;
+      }
+      .block-de .block-label { color: #6db3f2; }
+      .block-tu-duy .block-label { color: #e0a92e; }
+      .block p:last-child, .block ul:last-child { margin-bottom: 0; }
+      .block ul { padding-left: 26px; }
+      .block li { margin-bottom: 8px; }
+      .sym-table {
+        border-collapse: collapse;
+        margin: 4px 0 6px;
+      }
+      .sym-table th, .sym-table td {
+        border: 1px solid #444;
+        padding: 4px 18px;
+        text-align: left;
+      }
+      .sym-table th { color: #6db3f2; }
+      .example { margin-bottom: 16px; }
+      .example:last-child { margin-bottom: 0; }
+      .back-top {
+        display: block;
+        margin: -12px 0 28px;
+        font-size: 19px;
+      }
+      .ok { color: #2e9e4f; font-weight: bold; }
+      .bad { color: #e05545; font-weight: bold; }
+      @media (max-width: 760px) {
+        main { padding: 18px 12px 40px; }
+        h1 { font-size: 27px; }
+        h2 { font-size: 24px; }
+        .pair { grid-template-columns: 1fr; }
+        .card { padding: 20px 16px; }
+        .block { padding: 16px 14px; }
+      }
+    </style>
+  </head>
+  <body>
+    <main id="top">
+      <h1>Roman to Integer — Guided Thinking (via Parallel Pairs)</h1>
+      <p class="source-line">Original LeetCode link: <a href="https://leetcode.com/problems/roman-to-integer/" target="_blank" rel="noopener">leetcode.com/problems/roman-to-integer</a></p>
+
+      <section class="card toc" aria-label="Table of contents">
+        <h2>Table of Contents</h2>
+        <ul>
+          <li><a href="#cap-1">Pair 1 — Goal: requirement + examples</a></li>
+          <li><a href="#cap-2">Pair 2 — Symbols: the value of each character</a></li>
+          <li><a href="#cap-3">Pair 3 — Subtraction Rule: the exception</a></li>
+          <li><a href="#cap-4">Pair 4 — Constraints</a></li>
+          <li><a href="#chot">Thinking Summary</a></li>
+          <li><a href="#tiep-theo">Next Steps</a></li>
+        </ul>
+      </section>
+      <a class="back-top" href="#top">↑ Back to top</a>
+
+      <!-- Pair 1 -->
+      <section class="card" id="cap-1">
+        <h2>Pair 1 — Goal</h2>
+        <p>Start here: what the problem gives, what it asks, and look through the examples first.</p>
+        <div class="pair">
+          <div class="block block-de">
+            <p class="block-label">PROBLEM</p>
+            <p>Given a roman numeral, convert it to an integer.</p>
+            <div class="example">
+              <p><strong>Example 1:</strong></p>
+              <p>Input: s = "III"<br />
+              Output: 3<br />
+              Explanation: III = 3.</p>
+            </div>
+            <div class="example">
+              <p><strong>Example 2:</strong></p>
+              <p>Input: s = "LVIII"<br />
+              Output: 58<br />
+              Explanation: L = 50, V = 5, III = 3.</p>
+            </div>
+            <div class="example">
+              <p><strong>Example 3:</strong></p>
+              <p>Input: s = "MCMXCIV"<br />
+              Output: 1994<br />
+              Explanation: M = 1000, CM = 900, XC = 90 and IV = 4.</p>
+            </div>
+          </div>
+          <div class="block block-tu-duy">
+            <p class="block-label">THINKING</p>
+            <p>Given (input): a string s — a roman numeral string.</p>
+            <p>Asked (output): convert it to an integer.</p>
+            <p>Deduction: this problem is about reading each character in the string and computing a number — not search, not sort.</p>
+          </div>
+        </div>
+      </section>
+      <a class="back-top" href="#top">↑ Back to top</a>
+
+      <!-- Pair 2 -->
+      <section class="card" id="cap-2">
+        <h2>Pair 2 — Symbols</h2>
+        <p>Go back to the definition pair: how much each character is worth.</p>
+        <div class="pair">
+          <div class="block block-de">
+            <p class="block-label">PROBLEM</p>
+            <p>Roman numerals are represented by seven different symbols: I, V, X, L, C, D and M.</p>
+            <table class="sym-table">
+              <tr><th>Symbol</th><th>Value</th></tr>
+              <tr><td>I</td><td>1</td></tr>
+              <tr><td>V</td><td>5</td></tr>
+              <tr><td>X</td><td>10</td></tr>
+              <tr><td>L</td><td>50</td></tr>
+              <tr><td>C</td><td>100</td></tr>
+              <tr><td>D</td><td>500</td></tr>
+              <tr><td>M</td><td>1000</td></tr>
+            </table>
+          </div>
+          <div class="block block-tu-duy">
+            <p class="block-label">THINKING</p>
+            <p>Each character has a fixed value: I=1, V=5, X=10, L=50, C=100, D=500, M=1000.</p>
+            <p>Verify with "LVIII": 50 + 5 + 1 + 1 + 1 = 58 <span class="ok">✓</span> matches the answer.</p>
+            <p>Deduction: in the normal case, ADD up the value of each character from left to right.</p>
+          </div>
+        </div>
+      </section>
+      <a class="back-top" href="#top">↑ Back to top</a>
+
+      <!-- Pair 3 -->
+      <section class="card" id="cap-3">
+        <h2>Pair 3 — Subtraction Rule</h2>
+        <p>The special-rule pair: where adding straight will be wrong.</p>
+        <div class="pair">
+          <div class="block block-de">
+            <p class="block-label">PROBLEM</p>
+            <p>For example, 2 is written as II in Roman numeral, just two ones added together. 12 is written as XII, which is simply X + II. The number 27 is written as XXVII, which is XX + V + II.</p>
+            <p>Roman numerals are usually written largest to smallest from left to right. However, the numeral for four is not IIII. Instead, the number four is written as IV. Because the one is before the five we subtract it making four. The same principle applies to the number nine, which is written as IX. There are six instances where subtraction is used:</p>
+            <ul>
+              <li>I can be placed before V (5) and X (10) to make 4 and 9.</li>
+              <li>X can be placed before L (50) and C (100) to make 40 and 90.</li>
+              <li>C can be placed before D (500) and M (1000) to make 400 and 900.</li>
+            </ul>
+          </div>
+          <div class="block block-tu-duy">
+            <p class="block-label">THINKING</p>
+            <p>Verify with "IV": adding straight 1 + 5 = 6, but the answer is 4 <span class="bad">✗</span> — adding straight is not always correct.</p>
+            <p>Observe: I (1) stands BEFORE V (5) — a smaller character before a larger character (smaller before larger) → must SUBTRACT: 5 − 1 = 4.</p>
+            <p>Deduction: at each position, compare the current character with the NEXT character: smaller → subtract; otherwise → add. The last character has no next → always add.</p>
+          </div>
+        </div>
+      </section>
+      <a class="back-top" href="#top">↑ Back to top</a>
+
+      <!-- Pair 4 -->
+      <section class="card" id="cap-4">
+        <h2>Pair 4 — Constraints</h2>
+        <p>The final pair: the constraints tell you what you do NOT need to do.</p>
+        <div class="pair">
+          <div class="block block-de">
+            <p class="block-label">PROBLEM</p>
+            <p><strong>Constraints:</strong></p>
+            <ul>
+              <li>1 &lt;= s.length &lt;= 15</li>
+              <li>s contains only the characters ('I', 'V', 'X', 'L', 'C', 'D', 'M').</li>
+              <li>It is guaranteed that s is a valid roman numeral in the range [1, 3999].</li>
+            </ul>
+          </div>
+          <div class="block block-tu-duy">
+            <p class="block-label">THINKING</p>
+            <p>The string is at most 15 characters long, and is always a valid roman numeral (guaranteed valid) → no input validation needed.</p>
+            <p>Deduction: a single pass from left to right is enough.</p>
+          </div>
+        </div>
+      </section>
+      <a class="back-top" href="#top">↑ Back to top</a>
+
+      <!-- Thinking summary -->
+      <section class="card" id="chot">
+        <h2>Thinking Summary</h2>
+        <ol>
+          <li>Go from left to right, accumulating into a running total.</li>
+          <li>At each character, look at it together with the NEXT character: smaller → SUBTRACT; otherwise → ADD.</li>
+          <li>The last character has no next → always add.</li>
+        </ol>
+      </section>
+      <a class="back-top" href="#top">↑ Back to top</a>
+
+      <!-- Next steps -->
+      <section class="card" id="tiep-theo">
+        <h2>Next Steps</h2>
+        <ol>
+          <li>Write simple English pseudocode following the 3 ideas above.</li>
+          <li>Code in JS first.</li>
+          <li>Convert to Python, and submit it yourself on LeetCode.</li>
+        </ol>
+      </section>
+      <a class="back-top" href="#top">↑ Back to top</a>
+    </main>
+  </body>
+</html>

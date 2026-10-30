@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="dark" />
+<link rel="icon" href="data:," />
+<title>System Design Session 8 — Cache (New Content)</title>
+<style>
+  * { box-sizing: border-box; }
+  html { scroll-behavior: auto; }
+  body {
+    margin: 0;
+    background: #000000;
+    color: #ffffff;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 21px;
+    line-height: 1.8;
+    padding: 28px 18px 64px;
+  }
+  main { width: 100%; max-width: none; margin: 0; }
+  h1 {
+    font-size: 34px;
+    line-height: 1.3;
+    margin: 0 0 10px;
+    letter-spacing: 0.01em;
+  }
+  h2 {
+    font-size: 27px;
+    line-height: 1.35;
+    margin: 0 0 14px;
+  }
+  h3 {
+    font-size: 23px;
+    line-height: 1.4;
+    margin: 22px 0 8px;
+  }
+  p { margin: 0 0 14px; }
+  a { color: #7cc7ff; text-decoration: underline; text-underline-offset: 3px; }
+  a:hover { color: #aee1ff; }
+  code, .mono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 19px;
+    background: #1c1c1c;
+    padding: 1px 6px;
+    border-radius: 4px;
+    word-break: break-word;
+  }
+  .subtitle {
+    font-size: 21px;
+    color: #e8e8e8;
+    margin-bottom: 8px;
+  }
+  .card {
+    background: #111111;
+    border: 1px solid #333333;
+    border-radius: 10px;
+    padding: 26px 24px 20px;
+    margin: 0 0 26px;
+  }
+  .toc-card { padding: 22px 24px 14px; }
+  .toc-list { margin: 0; padding-left: 22px; }
+  .toc-list li { margin-bottom: 6px; }
+  .backtop {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid #2c2c2c;
+    font-size: 19px;
+  }
+  .note-box {
+    background: #1d1a08;
+    border: 1px solid #8a6d1a;
+    border-radius: 8px;
+    padding: 18px 20px 6px;
+    margin: 14px 0 6px;
+  }
+  .note-box-blue {
+    background: #0d1b26;
+    border: 1px solid #2f5f7f;
+    border-radius: 8px;
+    padding: 18px 20px 6px;
+    margin: 14px 0 6px;
+  }
+  ul.plain { margin: 0 0 14px; padding-left: 24px; }
+  ul.plain li { margin-bottom: 10px; }
+  hr.sep { border: none; border-top: 1px solid #2c2c2c; margin: 20px 0; }
+  /* Section icon */
+  .sec-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px; height: 46px;
+    border: 1px solid #444444;
+    border-radius: 8px;
+    background: #1a1a1a;
+    vertical-align: -12px;
+    margin-right: 12px;
+  }
+  .sec-icon svg { width: 26px; height: 26px; }
+  /* Example blocks */
+  .example {
+    background: #161616;
+    border: 1px solid #2c2c2c;
+    border-radius: 8px;
+    padding: 18px 20px 8px;
+    margin: 16px 0;
+  }
+  .example h3 { margin-top: 0; }
+  .flow-label {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    letter-spacing: 0.1em;
+    color: #ffd23f;
+  }
+  /* Pros / cons */
+  .proscons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 12px 0 14px;
+  }
+  .pros, .cons {
+    flex: 1 1 260px;
+    border-radius: 8px;
+    padding: 14px 18px 4px;
+    font-size: 20px;
+  }
+  .pros { background: #0c1f12; border: 1px solid #2e9e4f; }
+  .cons { background: #2a100d; border: 1px solid #b03a2e; }
+  .pros .pc-head { color: #a7e8bc; font-weight: bold; }
+  .cons .pc-head { color: #f0a49c; font-weight: bold; }
+  .pros ul, .cons ul { margin: 6px 0 10px; padding-left: 22px; }
+  .pros li, .cons li { margin-bottom: 6px; }
+  /* Diagram */
+  .diagram {
+    background: #0a0a0a;
+    border: 1px solid #333333;
+    border-radius: 8px;
+    padding: 20px 16px 12px;
+    margin: 18px 0 8px;
+  }
+  .diagram .cap {
+    font-size: 19px;
+    color: #cccccc;
+    margin-top: 12px;
+  }
+  .flow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 10px;
+    margin: 10px 0;
+  }
+  .node {
+    background: #1a1a1a;
+    border: 1px solid #555555;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 19px;
+    text-align: center;
+  }
+  .node.cache { border-color: #2f5f7f; background: #0d1b26; }
+  .node.db { border-color: #8a6d1a; background: #1d1a08; }
+  .node.bad { border-color: #b03a2e; background: #2a100d; }
+  .node small { display: block; font-size: 16px; color: #bbbbbb; line-height: 1.5; }
+  .arrow { color: #7cc7ff; font-size: 22px; font-weight: bold; }
+  .arrow.down { display: block; text-align: center; width: 100%; }
+  .step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: #2f5f7f;
+    color: #ffffff;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    flex: 0 0 auto;
+  }
+  .timeline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    margin: 12px 0;
+    border: 1px solid #444444;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .tl-seg { flex: 1 1 150px; padding: 10px 14px; font-size: 19px; }
+  .tl-fresh { background: #0c1f12; }
+  .tl-old { background: #1d1a08; }
+  .tl-dead { background: #2a100d; }
+  .tl-seg strong { display: block; font-size: 18px; }
+  @media (max-width: 560px) {
+    body { font-size: 20px; padding: 20px 12px 52px; }
+    h1 { font-size: 29px; }
+    .card { padding: 20px 16px 16px; }
+    .pros, .cons { flex-basis: 100%; }
+  }
+</style>
+</head>
+<body id="top">
+<main>
+
+  <h1>System Design — Session 8: Lesson 7 Cache (New Content)</h1>
+  <p class="subtitle">Continuing from Session 7 (Sections 1–4: what a cache is, where a cache sits, data granularity, the 4 patterns). Session 8 covers the rest of the Cache lesson in the system-design-primer: comparing the 4 patterns, TTL and stale data, eviction policies, and the disadvantages of caching.</p>
+
+  <div class="card toc-card">
+    <h2>Contents</h2>
+    <ol class="toc-list">
+      <li><a href="#s1">Section 1 — Comparing the 4 patterns (Pattern comparison)</a></li>
+      <li><a href="#s2">Section 2 — TTL and stale data</a></li>
+      <li><a href="#s3">Section 3 — Eviction policies</a></li>
+      <li><a href="#s4">Section 4 — Disadvantages of caching</a></li>
+      <li><a href="#keywords">Keywords</a></li>
+    </ol>
+  </div>
+
+  <!-- SECTION 1 -->
+  <section class="card" id="s1">
+    <h2><span class="sec-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#7cc7ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v18"/><path d="M16 3v18"/><path d="M3 8h5"/><path d="M3 16h5"/><path d="M16 8h5"/><path d="M16 16h5"/></svg></span>Section 1 — Comparing the 4 patterns (Pattern comparison)</h2>
+
+    <div class="note-box">
+      <p><strong>Read this first:</strong> this section is a <strong>comparison summary</strong> of <strong>Section 4 already learned in Session 7</strong> — it is <strong>not brand-new content</strong>. Session 7 introduced each cache access pattern; this section puts all four side by side and compares their read / write flows and pros / cons.</p>
+    </div>
+
+    <div class="note-box-blue">
+      <p><strong>Link back to Session 7 — Section 4:</strong> the 4 cache access patterns. That section's main content: how the application reads and writes data through the cache — cache-aside, write-through, write-behind, refresh-ahead. This section does not teach them again from scratch; it only compares them with each other.</p>
+    </div>
+
+    <div class="example">
+      <h3>Example 1.1 — Cache-aside (lazy loading)</h3>
+      <p><span class="flow-label">READ</span></p>
+      <p>The application checks the cache first. On a hit, it returns the data right away. On a miss, it reads the database, fills (populates) the cache, and then returns the data.</p>
+      <p><span class="flow-label">WRITE</span></p>
+      <p>The application writes directly to the database, then invalidates or updates the matching entry in the cache.</p>
+      <div class="proscons">
+        <div class="pros">
+          <span class="pc-head">Pros</span>
+          <ul>
+            <li>Simple and easy to implement.</li>
+            <li>Only data that is actually read gets cached — no memory is wasted on data nobody uses.</li>
+          </ul>
+        </div>
+        <div class="cons">
+          <span class="pc-head">Cons</span>
+          <ul>
+            <li>Every miss costs 3 trips: cache → DB → cache.</li>
+            <li>The data in the cache can go stale.</li>
+            <li>A new cache node starts empty.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="example">
+      <h3>Example 1.2 — Write-through</h3>
+      <p><span class="flow-label">WRITE</span></p>
+      <p>On every write, the application writes to the cache and the database together (synchronously), and only then returns.</p>
+      <p><span class="flow-label">READ</span></p>
+      <p>Reads come from the cache as usual. Because every write goes through the cache, the data in the cache always matches the database.</p>
+      <div class="proscons">
+        <div class="pros">
+          <span class="pc-head">Pros</span>
+          <ul>
+            <li>The cache is always fresh — the cached data always matches the database.</li>
+          </ul>
+        </div>
+        <div class="cons">
+          <span class="pc-head">Cons</span>
+          <ul>
+            <li>Writes are slower, because both stores must be written before returning.</li>
+            <li>Data that nobody reads is cached too — wasted memory.</li>
+            <li>A new node stays empty until the first update is written through it.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="example">
+      <h3>Example 1.3 — Write-behind / Write-back</h3>
+      <p><span class="flow-label">WRITE</span></p>
+      <p>The application writes to the cache and returns immediately. The database is written asynchronously later, by the cache itself.</p>
+      <p><span class="flow-label">READ</span></p>
+      <p>Reads come from the cache — and because writes also land in the cache first, a read right after a write sees the newest data in the cache.</p>
+      <div class="proscons">
+        <div class="pros">
+          <span class="pc-head">Pros</span>
+          <ul>
+            <li>Very fast writes — the user never waits for the database.</li>
+          </ul>
+        </div>
+        <div class="cons">
+          <span class="pc-head">Cons</span>
+          <ul>
+            <li>Data loss if the cache crashes before it writes to the database.</li>
+            <li>Complex to implement.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="example">
+      <h3>Example 1.4 — Refresh-ahead</h3>
+      <p><span class="flow-label">READ</span></p>
+      <p>The cache refreshes entries that were recently read, just before they expire. The next reader gets the fresh copy from the cache right away.</p>
+      <p><span class="flow-label">WRITE</span></p>
+      <p>The write flow is unchanged — what makes this pattern different is the read side: reloading the data happens ahead of time, instead of waiting for a reader to miss.</p>
+      <div class="proscons">
+        <div class="pros">
+          <span class="pc-head">Pros</span>
+          <ul>
+            <li>Lower read latency — fewer readers suffer a miss and have to wait for the database.</li>
+          </ul>
+        </div>
+        <div class="cons">
+          <span class="pc-head">Cons</span>
+          <ul>
+            <li>If the prediction is wrong — refreshing data that nobody reads again — it is worse than doing nothing: the work and the resources are wasted.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="diagram" role="img" aria-label="Diagram: the read flow checks the cache first; in the write flow, the order of cache and database depends on the chosen pattern">
+      <p style="margin:0 0 6px;"><strong>Diagram 1 — Reads and writes take two different paths</strong></p>
+      <p style="margin:0;"><span class="flow-label">READ</span></p>
+      <div class="flow">
+        <span class="node">App</span>
+        <span class="arrow">→</span>
+        <span class="node cache">Cache<small>checked first</small></span>
+        <span class="arrow">→ miss →</span>
+        <span class="node db">Database<small>only reached on a miss</small></span>
+      </div>
+      <p style="margin:10px 0 0;"><span class="flow-label">WRITE — THE ORDER IS DECIDED BY THE PATTERN</span></p>
+      <div class="flow">
+        <span class="node">Cache-aside<small>write DB, invalidate cache</small></span>
+        <span class="node">Write-through<small>write cache + DB together</small></span>
+        <span class="node">Write-behind<small>write cache, DB later</small></span>
+        <span class="node">Refresh-ahead<small>refresh before expiry</small></span>
+      </div>
+      <p class="cap">The key idea to remember: all four patterns look the same on the read side (the cache stands in front of the database). They differ in <strong>when the database is written</strong> and in <strong>who loads data into the cache</strong>.</p>
+    </div>
+
+    <div class="backtop"><a href="#top">↑ Back to top</a></div>
+  </section>
+
+  <!-- SECTION 2 -->
+  <section class="card" id="s2">
+    <h2><span class="sec-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#ffd23f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span>Section 2 — TTL and stale data</h2>
+
+    <div class="note-box-blue">
+      <p><strong>Link back to Session 7 — Section 1:</strong> what a cache is. That section's main content: a cache is a fast storage layer sitting in front of the database, holding a copy of the data so later reads do not have to go down to the database. Because the data in the cache is only a <strong>copy</strong>, it can be older than the original in the database — that is exactly the root of the stale data in this section.</p>
+    </div>
+
+    <h3>TTL (time-to-live)</h3>
+    <p>TTL is the lifespan of an entry in the cache. When the TTL runs out, the entry counts as a miss: the next read must go down to the database, fetch the newest data, and fill the cache again with a new TTL.</p>
+
+    <h3>Stale data</h3>
+    <p>Stale data is when the cache returns data that is older than the real data in the database. The cause: the database was updated, but the copy in the cache was not — the cache still holds the old copy and keeps serving it to readers.</p>
+
+    <h3>How to choose a TTL</h3>
+    <ul class="plain">
+      <li>Highly dynamic data (data that changes fast) → set a short TTL: accept more trips to the database so the data never stays old for long.</li>
+      <li>Rarely changing data → a long TTL is fine: the copy in the cache almost always matches the database, so it rarely needs reloading.</li>
+    </ul>
+
+    <div class="example">
+      <h3>Example 2.1 — Short TTL for fast-changing data</h3>
+      <p>A product price on a shopping page changes many times a day. With a long TTL, customers would keep seeing a stale price long after the real price changed. So this kind of data gets a short TTL — a few seconds to a few minutes — so the cached price is refreshed from the database quickly.</p>
+    </div>
+
+    <div class="example">
+      <h3>Example 2.2 — Long TTL for rarely changing data</h3>
+      <p>The country list in a sign-up form almost never changes. A long TTL — hours, even days — is safe for this kind of data, because the copy in the cache almost always matches the database.</p>
+    </div>
+
+    <div class="diagram" role="img" aria-label="Diagram of the lifecycle of a cache entry: written into the cache, fresh during its TTL, and once the TTL expires it counts as a miss and the next read goes down to the database">
+      <p style="margin:0 0 6px;"><strong>Diagram 2 — The lifecycle of an entry under TTL</strong></p>
+      <div class="timeline">
+        <div class="tl-seg tl-fresh"><strong>① Fresh</strong>The entry was just loaded from the database. Reads hit the cache; the data is new.</div>
+        <div class="tl-seg tl-old"><strong>② Within TTL</strong>The database may have changed → the cached copy is at risk of becoming stale data.</div>
+        <div class="tl-seg tl-dead"><strong>③ Expired</strong>The entry counts as a miss. The next read goes down to the database for the newest copy.</div>
+      </div>
+      <p class="cap">The key idea to remember: TTL is the simplest way to limit how old cached data can get — the faster the data changes, the shorter the TTL must be.</p>
+    </div>
+
+    <div class="backtop"><a href="#top">↑ Back to top</a></div>
+  </section>
+
+  <!-- SECTION 3 -->
+  <section class="card" id="s3">
+    <h2><span class="sec-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#f0a49c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h13"/><path d="M3 12h13"/><path d="M3 18h9"/><path d="M18 9l3 3-3 3"/><path d="M21 12H11"/></svg></span>Section 3 — Eviction policies</h2>
+
+    <div class="note-box-blue">
+      <p><strong>Link back to Session 7 — Section 2:</strong> where a cache sits (cache placement). That section's main content: a cache lives in memory (RAM) — fast, but with a much smaller and more expensive capacity than disk. Because memory is limited, the cache fills up sooner or later — and that is why the system needs the eviction policies in this section.</p>
+    </div>
+
+    <h3>The problem: what happens when the cache is full?</h3>
+    <p>When the cache is full, adding a new entry requires evicting (removing) an old one to make room. The question is: <strong>which entry gets evicted?</strong> An eviction policy is the rule that answers that question.</p>
+
+    <h3>The 6 eviction policies</h3>
+    <ul class="plain">
+      <li><strong>FIFO (first in first out):</strong> evict the entry that was inserted into the cache earliest.</li>
+      <li><strong>LIFO (last in first out):</strong> evict the entry that was inserted into the cache most recently.</li>
+      <li><strong>LRU (least recently used):</strong> evict the entry that has been unused for the longest time.</li>
+      <li><strong>MRU (most recently used):</strong> evict the entry that was used most recently.</li>
+      <li><strong>LFU (least frequently used):</strong> evict the entry with the lowest total access count.</li>
+      <li><strong>Random:</strong> evict a random entry.</li>
+    </ul>
+
+    <div class="example">
+      <h3>Example 3.1 — LRU evicts the entry nobody has touched for the longest time</h3>
+      <p>The cache holds 3 entries: A, B, C. Recency of reads: A was read 1 minute ago, B was read 10 minutes ago, and C has not been read for 1 hour. The cache is full and a new entry D needs a slot. Under LRU, C is evicted — because C is the least recently used entry, it is the least likely of the three to be needed again soon.</p>
+      <p>Under MRU, on the other hand, A would be evicted, because A was used most recently — that fits workloads where data that was just used is unlikely to be used again right away, for example scanning through a long list exactly once.</p>
+    </div>
+
+    <div class="diagram" role="img" aria-label="Diagram: a full cache holding A, B, C; a new entry D needs a slot, so C, the least recently used entry, is evicted under LRU">
+      <p style="margin:0 0 6px;"><strong>Diagram 3 — One eviction under LRU</strong></p>
+      <div class="flow">
+        <span class="step-num">1</span>
+        <span class="node cache">Cache is full<small>A · B · C — no free space</small></span>
+        <span class="arrow">→</span>
+        <span class="step-num">2</span>
+        <span class="node">New entry D<small>needs a slot in the cache</small></span>
+      </div>
+      <div class="flow">
+        <span class="step-num">3</span>
+        <span class="node bad">C is evicted<small>unused for the longest time — LRU</small></span>
+        <span class="arrow">→</span>
+        <span class="step-num">4</span>
+        <span class="node cache">New cache<small>A · B · D</small></span>
+      </div>
+      <p class="cap">The key idea to remember: a cache can never hold everything. Choosing an eviction policy means choosing <strong>which entry to sacrifice</strong> — based on arrival order (FIFO / LIFO), most recent use (LRU / MRU), number of uses (LFU), or nothing at all (Random).</p>
+    </div>
+
+    <div class="backtop"><a href="#top">↑ Back to top</a></div>
+  </section>
+
+  <!-- SECTION 4 -->
+  <section class="card" id="s4">
+    <h2><span class="sec-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#b03a2e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3L2 20h20L12 3z"/><path d="M12 10v4"/><path d="M12 17.5v.5"/></svg></span>Section 4 — Disadvantages of caching</h2>
+
+    <div class="note-box-blue">
+      <p><strong>Link back to Session 7 — Section 2 and Lesson 5:</strong> Section 2 of Session 7 covered the global cache — one Redis shared by every application server — alongside the local cache inside each server. Lesson 5 covered the load balancer and the idea of never letting one component become the single point that kills the system. This section connects those two ideas: the global cache itself, without HA, becomes the single point of failure for the whole system.</p>
+    </div>
+
+    <ul class="plain">
+      <li><strong>Stale data:</strong> the cache can drift away from the database. This is the root disadvantage: a cache is a copy, and a copy can always disagree with the original (see Section 2 of this session).</li>
+      <li><strong>Cold start:</strong> a new cache node starts empty. The first wave of requests all miss and hit the database at the same time → the database gets overloaded exactly when the system is at its weakest.</li>
+      <li><strong>Memory and cost:</strong> a cache lives in RAM — the most expensive kind of memory. The more data you keep in the cache, the bigger the bill.</li>
+      <li><strong>Added complexity:</strong> adding a cache means dealing with two hard problems: invalidation (removing or expiring old data in the cache) and consistency (making sure the cache and the database do not contradict each other).</li>
+      <li><strong>A global cache can become a single point of failure:</strong> if every application server shares one Redis (a global cache) and that Redis has no HA (high availability — a standby copy that automatically takes over when the main one dies), then Redis dying means every server loses its cache at the same moment, and all requests flood the database. Such a component is called a single point of failure.</li>
+    </ul>
+
+    <div class="example">
+      <h3>Example 4.1 — A cold start overloads the database</h3>
+      <p>A new cache node is added to the system at peak hour. The node is empty, so every request routed to it misses and goes on to the database. The database normally handles only the few requests that miss; now it suddenly has to handle almost all of them — and it can go down from overload, even though the database itself has no bug.</p>
+    </div>
+
+    <div class="example">
+      <h3>Example 4.2 — One shared Redis dies, the whole system loses its cache</h3>
+      <p>Three application servers share one Redis as a global cache, and that Redis has no standby (no HA). When Redis dies, all three servers lose their cache in the same moment. Every request misses and floods the database — the same overload scenario as Example 4.1, but across the whole system at once. This is a single point of failure: one component dying takes the whole system down with it. The Load Balancer lesson (Lesson 5) taught the principle of avoiding a single point of failure at the server layer; the same principle applies exactly the same way at the cache layer.</p>
+    </div>
+
+    <div class="diagram" role="img" aria-label="Diagram: three application servers share one Redis with no standby; Redis is the single point of failure, and if it dies every request floods the database">
+      <p style="margin:0 0 6px;"><strong>Diagram 4 — A global cache without HA = a single point of failure</strong></p>
+      <div class="flow">
+        <span class="node">App server 1</span>
+        <span class="node">App server 2</span>
+        <span class="node">App server 3</span>
+      </div>
+      <span class="arrow down">↓ ↓ ↓ &nbsp;all of them share&nbsp; ↓ ↓ ↓</span>
+      <div class="flow">
+        <span class="node bad">1 shared Redis (global cache)<small>NO HA → single point of failure</small></span>
+      </div>
+      <span class="arrow down">↓ &nbsp;Redis dies → every request misses&nbsp; ↓</span>
+      <div class="flow">
+        <span class="node db">Database<small>overloaded by carrying every request</small></span>
+      </div>
+      <p class="cap">The key idea to remember: a cache makes the system faster, but the price is stale data, cold starts, memory cost, and extra complexity — and if a shared cache has no HA, the cache itself becomes the single point of failure.</p>
+    </div>
+
+    <div class="backtop"><a href="#top">↑ Back to top</a></div>
+  </section>
+
+  <!-- KEYWORDS -->
+  <section class="card" id="keywords">
+    <h2>Keywords — Session 8</h2>
+
+    <h3>Section 1 — Pattern comparison</h3>
+    <ul class="plain">
+      <li><strong>Pattern comparison</strong> — comparing the cache access patterns side by side</li>
+      <li><strong>Cache access pattern</strong> — the strategy an application uses to read and write through the cache</li>
+      <li><strong>Read flow / write flow</strong> — the path a read / a write takes through cache and database</li>
+      <li><strong>Pros / cons</strong> — advantages / disadvantages</li>
+      <li><strong>Cache-aside = lazy loading</strong> — the application loads data into the cache only on a miss</li>
+      <li><strong>Hit / miss</strong> — the requested data found / not found in the cache</li>
+      <li><strong>Populate the cache</strong> — to fill the cache with data</li>
+      <li><strong>Invalidate</strong> — to remove or mark an entry in the cache as no longer valid</li>
+      <li><strong>Write-through</strong> — every write goes to the cache and the database together</li>
+      <li><strong>Synchronously</strong> — at the same time, blocking until done</li>
+      <li><strong>Fresh</strong> — (data) up to date, matching the database</li>
+      <li><strong>Write-behind = write-back</strong> — write to the cache now, to the database later</li>
+      <li><strong>Asynchronously</strong> — later, in the background, without blocking</li>
+      <li><strong>Crash</strong> — a sudden failure of a system or process</li>
+      <li><strong>Data loss</strong> — permanently losing data</li>
+      <li><strong>Implementation</strong> — the work of building something</li>
+      <li><strong>Refresh-ahead</strong> — refreshing entries just before they expire</li>
+      <li><strong>Expire</strong> — to reach the end of a lifespan and stop being valid</li>
+      <li><strong>Latency</strong> — the delay before a response arrives</li>
+      <li><strong>Prediction</strong> — a guess about what will be needed in the future</li>
+    </ul>
+
+    <h3>Section 2 — TTL and stale data</h3>
+    <ul class="plain">
+      <li><strong>TTL = time-to-live</strong> — the lifespan of a cache entry</li>
+      <li><strong>Stale data</strong> — cached data that is older than the real data in the database</li>
+      <li><strong>Copy</strong> — a duplicate of the original data</li>
+      <li><strong>Highly dynamic data</strong> — data that changes very often</li>
+      <li><strong>Rarely changing data</strong> — data that almost never changes</li>
+      <li><strong>Short TTL / long TTL</strong> — a brief / an extended lifespan for an entry</li>
+      <li><strong>Lifecycle</strong> — the stages an entry goes through from creation to expiry</li>
+      <li><strong>Expired</strong> — past the end of its TTL, no longer valid</li>
+    </ul>
+
+    <h3>Section 3 — Eviction policies</h3>
+    <ul class="plain">
+      <li><strong>Eviction policy</strong> — the rule that decides which entry leaves a full cache</li>
+      <li><strong>Evict</strong> — to remove an entry from the cache</li>
+      <li><strong>Full</strong> — (a cache) with no free space left</li>
+      <li><strong>Capacity</strong> — how much a cache can hold</li>
+      <li><strong>FIFO = first in first out</strong> — evict the earliest inserted entry</li>
+      <li><strong>LIFO = last in first out</strong> — evict the most recently inserted entry</li>
+      <li><strong>LRU = least recently used</strong> — evict the entry unused for the longest time</li>
+      <li><strong>MRU = most recently used</strong> — evict the most recently used entry</li>
+      <li><strong>LFU = least frequently used</strong> — evict the entry with the lowest access count</li>
+      <li><strong>Random</strong> — evict an entry chosen at random</li>
+      <li><strong>Scan</strong> — to walk through a long list from start to end</li>
+    </ul>
+
+    <h3>Section 4 — Disadvantages</h3>
+    <ul class="plain">
+      <li><strong>Disadvantage</strong> — a downside or drawback</li>
+      <li><strong>Cold start</strong> — a new cache node starting completely empty</li>
+      <li><strong>Overloaded</strong> — given more work than it can handle</li>
+      <li><strong>Memory</strong> — RAM, where a cache lives</li>
+      <li><strong>Cost</strong> — the money a resource takes to run</li>
+      <li><strong>Complexity</strong> — how hard a system is to build and maintain</li>
+      <li><strong>Invalidation</strong> — removing or expiring old data in the cache</li>
+      <li><strong>Consistency</strong> — the cache and the database agreeing with each other</li>
+      <li><strong>Global cache</strong> — one cache shared by all servers</li>
+      <li><strong>Local cache</strong> — a cache inside each individual server</li>
+      <li><strong>HA = high availability</strong> — the system stays up even when a component dies</li>
+      <li><strong>Standby</strong> — a backup copy waiting to take over</li>
+      <li><strong>Single point of failure</strong> — one component whose failure takes the whole system down</li>
+      <li><strong>Load balancer</strong> — the component that spreads traffic across servers (Lesson 5)</li>
+    </ul>
+
+    <div class="backtop"><a href="#top">↑ Back to top</a></div>
+  </section>
+
+</main>
+</body>
+</html>
