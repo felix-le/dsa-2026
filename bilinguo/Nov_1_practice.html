@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="dark" />
+<link rel="icon" href="data:," />
+<title>Đề Ôn Tập Chủ Nhật 2026-11-01</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { overflow-x: hidden; }
+  body {
+    margin: 0;
+    background: #000;
+    color: #fff;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 21px;
+    line-height: 1.8;
+  }
+  main { width: 100%; padding: 20px 18px 48px; }
+  h1 { font-size: 34px; line-height: 1.3; margin: 8px 0 10px; }
+  h2 { font-size: 28px; line-height: 1.35; margin: 0 0 14px; }
+  h3 { font-size: 24px; line-height: 1.4; margin: 0 0 10px; }
+  h4 { font-size: 21px; line-height: 1.5; margin: 22px 0 6px; }
+  p { margin: 0 0 14px; }
+  ul, ol { margin: 0 0 14px; padding-left: 28px; }
+  li { margin-bottom: 8px; }
+  a { color: #8ec2ff; overflow-wrap: anywhere; }
+  a:visited { color: #c4a8ff; }
+  .intro { color: #e8e8e8; }
+  .note {
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin: 0 0 20px;
+  }
+  .note p:last-child, .card p:last-child, .card ul:last-child, .card ol:last-child { margin-bottom: 0; }
+  .card {
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 22px 22px;
+    margin: 0 0 22px;
+  }
+  .card-num {
+    color: #f0b429;
+    font-weight: bold;
+  }
+  .question-en {
+    background: #000;
+    border: 1px solid #444;
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin: 12px 0 16px;
+    font-style: italic;
+  }
+  .question-en p { margin: 0 0 8px; }
+  .question-en p:last-child { margin-bottom: 0; }
+  .keywords {
+    border-top: 1px solid #333;
+    padding-top: 12px;
+    margin-top: 16px;
+  }
+  .keywords strong { color: #f0b429; }
+  .step-label { font-weight: bold; color: #f0b429; }
+  .toc a { text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .toc li { margin-bottom: 6px; }
+  .top-link { display: inline-block; margin: 4px 0 28px; font-size: 19px; }
+  .task-box {
+    background: #000;
+    border: 1px solid #444;
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin: 12px 0 16px;
+  }
+  .task-box p:last-child, .task-box ol:last-child { margin-bottom: 0; }
+  .checklist { list-style: none; padding-left: 0; }
+  .checklist li {
+    background: #000;
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 10px;
+  }
+  .checklist li::before { content: "—  "; color: #f0b429; font-weight: bold; }
+  .divider { border: 0; border-top: 1px solid #333; margin: 34px 0; }
+  code {
+    font-family: "Courier New", monospace;
+    font-size: 19px;
+    background: #000;
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 1px 6px;
+    overflow-wrap: anywhere;
+  }
+  @media (max-width: 640px) {
+    body { font-size: 21px; }
+    main { padding: 14px 12px 40px; }
+    h1 { font-size: 29px; }
+    h2 { font-size: 25px; }
+    h3 { font-size: 23px; }
+    .card, .note { padding: 18px 16px; }
+    ul, ol { padding-left: 24px; }
+  }
+</style>
+</head>
+<body>
+<main id="top">
+
+  <h1>Đề Ôn Tập — Chủ Nhật, 1 tháng 11 năm 2026</h1>
+  <p class="intro">Đây là <strong>đề ôn tập</strong> (practice test), bao quát toàn bộ nội dung đã học: 5 bài DSA và 7 lesson System Design. Đề thi thật tối nay (khoảng 16:00–17:00) là riêng — random, khó hơn, không có hướng dẫn — và không nằm trong trang này.</p>
+
+  <section class="note" aria-label="Mục lục">
+    <h2>Mục lục</h2>
+    <ul class="toc">
+      <li><a href="#huong-dan-chung">Hướng dẫn chung</a></li>
+      <li><a href="#khung-audio">Khung trả lời audio — 4 bước (áp dụng mọi bài DSA)</a></li>
+      <li><a href="#phan-1">Phần 1: DSA — 5 bài</a>
+        <ul>
+          <li><a href="#bai-1">Bài 1 — Two Sum (LeetCode #1)</a></li>
+          <li><a href="#bai-2">Bài 2 — Palindrome Number (LeetCode #9)</a></li>
+          <li><a href="#bai-3">Bài 3 — Longest Common Prefix (LeetCode #14)</a></li>
+          <li><a href="#bai-4">Bài 4 — Roman to Integer (LeetCode #13)</a></li>
+          <li><a href="#bai-5">Bài 5 — Valid Parentheses (LeetCode #20)</a></li>
+        </ul>
+      </li>
+      <li><a href="#phan-2">Phần 2: System Design — 7 lessons</a>
+        <ul>
+          <li><a href="#lesson-1">Lesson 1 — Performance vs Scalability; Latency vs Throughput</a></li>
+          <li><a href="#lesson-2">Lesson 2 — Availability vs Consistency; CAP</a></li>
+          <li><a href="#lesson-3">Lesson 3 — DNS</a></li>
+          <li><a href="#lesson-4">Lesson 4 — CDN push/pull</a></li>
+          <li><a href="#lesson-5">Lesson 5 — Load Balancer</a></li>
+          <li><a href="#lesson-6">Lesson 6 — SQL vs NoSQL</a></li>
+          <li><a href="#lesson-7">Lesson 7 — Cache</a></li>
+        </ul>
+      </li>
+      <li><a href="#checklist">Checklist cuối buổi ôn</a></li>
+    </ul>
+  </section>
+
+  <section class="card" id="huong-dan-chung">
+    <h2>Hướng dẫn chung</h2>
+    <p>Đây là đề <strong>ôn tập</strong>, được mở tài liệu khi cần. Mục tiêu là luyện nói và chắc kiến thức, không phải làm trong áp lực như đề thi thật.</p>
+    <p><strong>Phần DSA:</strong> mỗi bài làm 3 bước — (1) viết lại solution Python ra giấy, không nhìn solution cũ; (2) thu 1 audio giải thích bằng tiếng Anh theo khung 4 bước bên dưới; (3) gửi ảnh giấy và audio ngay sau mỗi bài, đừng dồn đến cuối buổi.</p>
+    <p><strong>Phần System Design:</strong> đọc câu hỏi, tự trả lời thành tiếng bằng tiếng Anh (thu audio), rồi gửi audio. Được mở lại bài học để kiểm tra sau khi đã thử trả lời — không mở bài học trước khi trả lời.</p>
+    <p><strong>Thứ tự làm bài:</strong> làm hết Phần 1 (DSA) rồi sang Phần 2 (System Design). Giữa buổi ôn và giờ thi thật, nghỉ ít nhất 30 phút, không nhìn màn hình.</p>
+  </section>
+  <a class="top-link" href="#top">↑ Về đầu trang</a>
+
+  <section class="card" id="khung-audio">
+    <h2>Khung trả lời audio — 4 bước</h2>
+    <p>Khung này áp dụng cho mọi bài DSA. Nói theo đúng thứ tự, đừng chỉ đọc code thành tiếng.</p>
+    <ol>
+      <li><span class="step-label">Bước 1 — Restate (nhắc lại đề):</span> nhắc lại đề bằng 1–2 câu tiếng Anh, nêu rõ input (đầu vào) và output (đầu ra) cần tìm.</li>
+      <li><span class="step-label">Bước 2 — Idea (ý tưởng):</span> nói ý tưởng chính và vì sao chọn cách đó — vì sao cách này tốt hơn cách duyệt brute force (duyệt toàn bộ), và chỗ nào là mấu chốt.</li>
+      <li><span class="step-label">Bước 3 — Walk through (đi qua code):</span> đi qua code, giải thích từng khối quan trọng: khởi tạo gì, vòng lặp làm gì, điều kiện dừng là gì, và lấy một ví dụ nhỏ chạy qua từng bước.</li>
+      <li><span class="step-label">Bước 4 — Complexity (độ phức tạp):</span> chốt time complexity (độ phức tạp thời gian) và space complexity (độ phức tạp bộ nhớ), kèm lý do ngắn gọn.</li>
+    </ol>
+    <div class="task-box">
+      <p><strong>Mẫu câu tiếng Anh dùng cho mọi bài — English sentence frames:</strong></p>
+      <ul>
+        <li>Restate: “Let me restate the problem.” / “The task is to …” / “Given …, return …”</li>
+        <li>Idea: “The idea is to …” / “We use X because …” / “This works because …” / “The key insight is that …”</li>
+        <li>Walk through: “Let me walk through the code step by step.” / “First, I initialise …” / “Then, in each iteration, …” / “Let me trace through an example: …” / “At this point, …” / “Finally, …”</li>
+        <li>Complexity: “The time complexity is O(n) because …” / “The space complexity is O(n) because …” / “In the worst case, …” / “We make a single pass, so …”</li>
+        <li>Comparing approaches: “A brute-force approach would be O(n²), because it checks every pair.” / “This approach is faster because it avoids …” / “The trade-off here is …”</li>
+      </ul>
+      <p><strong>Vocabulary:</strong> restate (nhắc lại đề), walk through (đi qua từng bước), trace through an example (chạy qua một ví dụ), initialise (khởi tạo), iteration (một vòng lặp), in the worst case (trong trường hợp xấu nhất), single pass (một lượt duyệt), brute force (duyệt toàn bộ), avoid (tránh), key insight (mấu chốt).</p>
+    </div>
+  </section>
+  <a class="top-link" href="#top">↑ Về đầu trang</a>
+
+  <hr class="divider" />
+
+  <h2 id="phan-1">Phần 1: DSA — 5 bài</h2>
+  <p class="intro">Mỗi bài: viết solution Python ra giấy trước, rồi thu audio tiếng Anh theo khung 4 bước. Gửi ảnh giấy và audio ngay sau mỗi bài.</p>
+
+  <!-- Bài 1 -->
+  <section class="card" id="bai-1">
+    <h3><span class="card-num">Bài 1</span> — Two Sum (LeetCode #1)</h3>
+    <p>Link gốc LeetCode: <a href="https://leetcode.com/problems/two-sum/" target="_blank" rel="noopener">https://leetcode.com/problems/two-sum/</a></p>
+    <div class="task-box">
+      <p><strong>Nhiệm vụ:</strong></p>
+      <ol>
+        <li>Viết lại solution Python ra giấy, không nhìn solution cũ.</li>
+        <li>Thu 1 audio giải thích bằng tiếng Anh theo khung 4 bước.</li>
+        <li>Gửi ảnh giấy và audio ngay sau bài này, đừng dồn cuối.</li>
+      </ol>
+    </div>
+    <h4>Hướng dẫn trả lời audio</h4>
+    <p><span class="step-label">Bước 1 — Restate:</span> nói theo gợi ý: “Given an array of integers and a target, find two indices i, j such that nums[i] + nums[j] equals target.” Nhấn mạnh: trả về chỉ số (index), không phải giá trị, và mỗi input chỉ có đúng một đáp án.</p>
+    <p><span class="step-label">Bước 2 — Idea:</span> dùng bảng băm (hash map / dictionary) để tra cứu trong O(1). Với mỗi số, tính phần bù (complement) = target − num. Kiểm tra phần bù đã có trong map <strong>trước</strong> khi lưu số hiện tại — để tránh dùng chính số đó hai lần. Giải thích vì sao cách này nhanh hơn duyệt từng cặp.</p>
+    <p><span class="step-label">Bước 3 — Walk through:</span> đi qua vòng lặp: tính complement, nếu complement có trong map thì return cặp chỉ số, nếu không thì lưu số hiện tại cùng chỉ số của nó vào map. Lấy một ví dụ nhỏ và chạy qua từng vòng lặp.</p>
+    <p><span class="step-label">Bước 4 — Complexity:</span> Time O(n), Space O(n) — duyệt mảng một lần, map lưu tối đa n phần tử.</p>
+    <div class="task-box">
+      <p><strong>Mẫu câu tiếng Anh — English sentence frames:</strong></p>
+      <ul>
+        <li>Restate: “Given an array of integers, <code>nums</code>, and an integer <code>target</code>, return the indices of the two numbers that add up to <code>target</code>.” / “I need to return indices, not values.” / “There is exactly one solution, and I cannot use the same element twice.”</li>
+        <li>Idea: “The idea is to use a hash map to store the numbers we have seen, so we can look up the complement in O(1) time.” / “We use a hash map because checking every pair would take O(n²) time.” / “For each number, the complement is <code>target</code> minus the current number.”</li>
+        <li>Walk through: “I iterate through the array once.” / “At each step, I check whether the complement is already in the map.” / “If it is, I return the stored index and the current index.” / “Otherwise, I store the current number and its index in the map.” / “Let me trace through an example: …”</li>
+        <li>Complexity: “The time complexity is O(n) because we make a single pass over the array.” / “The space complexity is O(n) because, in the worst case, the map stores n entries.”</li>
+      </ul>
+    </div>
+    <p class="keywords"><strong>Keywords bắt buộc:</strong> hash map / dictionary (bảng băm), complement (phần bù), index (chỉ số), lookup (tra cứu), look up (tra cứu), store (lưu trữ), single pass (một lượt duyệt), add up to (cộng lại bằng), exactly one solution (đúng một đáp án), same element twice (cùng một phần tử hai lần), every pair (mọi cặp), return indices (trả về chỉ số), current number (số hiện tại), stored index (chỉ số đã lưu).</p>
+  </section>
+  <a class="top-link" href="#top">↑ Về đầu trang</a>
+
+  <!-- Bài 2 -->
+  <section class="card" id="bai-2">
+    <h3><span class="card-num">Bài 2</span> — Palindrome Number (LeetCode #9)</h3>
+    <p>Link gốc LeetCode: <a href="https://leetcode.com/problems/palindrome-number/" target="_blank" rel="noopener">https://leetcode.com/problems/palindrome-number/</a></p>
+    <div class="task-box">
+      <p><strong>Nhiệm vụ:</strong></p>
+      <ol>
+        <li>Viết lại solution Python ra giấy, không nhìn solution cũ.</li>
+        <li>Thu 1 audio giải thích bằng tiếng Anh theo khung 4 bước.</li>
+        <li>Gửi ảnh giấy và audio ngay sau bài này, đừng dồn cuối.</li>
+      </ol>
+    </div>
+    <h4>Hướng dẫn trả lời audio</h4>
+    <p><span class="step-label">Bước 1 — Restate:</span> nói theo gợi ý: “Check if an integer reads the same forward and backward.” Nêu rõ: kết quả trả về là true/false.</p>
+    <p><span class="step-label">Bước 2 — Idea:</span> đổi số thành chuỗi (string) rồi dùng hai con trỏ (two pointers) từ hai đầu đi vào giữa, so từng cặp ký tự. Nêu hai trường hợp loại ngay: số âm thì false; số có chữ số 0 ở cuối (trừ chính số 0) thì false, vì số đọc ngược sẽ bắt đầu bằng 0.</p>
+    <p><span class="step-label">Bước 3 — Walk through:</span> đi qua code: <code>str(x)</code>, đặt <code>left</code> ở đầu và <code>right</code> ở cuối, vòng lặp <code>while left &lt; right</code> so sánh từng cặp, gặp cặp khác nhau thì return false, hai con trỏ gặp nhau mà không có cặp nào khác thì return true. Chạy một ví dụ số đối xứng và một ví dụ không đối xứng.</p>
+    <p><span class="step-label">Bước 4 — Complexity:</span> Time O(n), Space O(n) — với n là số chữ số; chuỗi mới chiếm thêm bộ nhớ theo số chữ số.</p>
+    <div class="task-box">
+      <p><strong>Mẫu câu tiếng Anh — English sentence frames:</strong></p>
+      <ul>
+        <li>Restate: “Given an integer <code>x</code>, return <code>true</code> if <code>x</code> is a palindrome, and <code>false</code> otherwise.” / “In other words, check whether the number reads the same forward and backward.” / “The result is a boolean: <code>true</code> or <code>false</code>.”</li>
+        <li>Idea: “The idea is to convert the number to a string and compare characters from both ends using two pointers.” / “A negative number cannot be a palindrome, because of the minus sign.” / “A number ending in zero cannot be a palindrome, unless the number itself is zero.”</li>
+        <li>Walk through: “I convert <code>x</code> to a string with <code>str(x)</code>.” / “I place <code>left</code> at the start and <code>right</code> at the end.” / “While <code>left</code> is less than <code>right</code>, I compare the two characters.” / “If they differ, I return <code>False</code> immediately.” / “Otherwise, I move both pointers inward.” / “If the loop finishes without a mismatch, I return <code>True</code>.”</li>
+        <li>Complexity: “The time complexity is O(n), where n is the number of digits, because we compare each pair of characters once.” / “The space complexity is O(n) because the new string takes extra memory proportional to the number of digits.”</li>
+      </ul>
+    </div>
+    <p class="keywords"><strong>Keywords bắt buộc:</strong> palindrome (đối xứng), two pointers (hai con trỏ), convert (chuyển đổi), string conversion (chuyển thành chuỗi), character (ký tự), compare (so sánh), differ (khác nhau), mismatch (không khớp), move inward (đi vào giữa), from both ends (từ hai đầu), reads the same forward and backward (đọc xuôi ngược như nhau), minus sign (dấu trừ), negative number (số âm), ending in zero (tận cùng bằng 0), number of digits (số chữ số), return <code>True</code> / <code>False</code> (trả về đúng / sai).</p>
+  </section>
+  <a class="top-link" href="#top">↑ Về đầu trang</a>
+
+  <!-- Bài 3 -->
+  <section class="card" id="bai-3">
+    <h3><span class="card-num">Bài 3</span> — Longest Common Prefix (LeetCode #14)</h3>
+    <p>Link gốc LeetCode: <a href="https://leetcode.com/problems/longest-common-prefix/" target="_blank" rel="noopener">https://leetcode.com/problems/longest-common-prefix/</a></p>
+    <div class="task-box">
+      <p><strong>Nhiệm vụ:</strong></p>
+      <ol>
+        <li>Viết lại solution Python ra giấy, không nhìn solution cũ.</li>
+        <li>Thu 1 audio giải thích bằng tiếng Anh theo khung 4 bước.</li>
+        <li>Gửi ảnh giấy và audio ngay sau bài này, đừng dồn cuối.</li>
+      </ol>
+    </div>
+    <h4>Hướng dẫn trả lời audio</h4>
+    <p><span class="step-label">Bước 1 — Restate:</span> nói theo gợi ý: “Find the longest common prefix string among an array of strings.” Nhấn mạnh: tiền tố (prefix) chung dài nhất của <strong>tất cả</strong> các chuỗi, không phải của một cặp.</p>
+    <p><span class="step-label">Bước 2 — Idea:</span> co dần theo cặp (pairwise shrink): lấy chuỗi đầu tiên làm prefix, rồi so với từng chuỗi còn lại, chỉ giữ phần chung. Prefix chỉ co lại hoặc giữ nguyên, không bao giờ dài ra. Gặp prefix rỗng thì return <code>""</code> ngay, không cần so tiếp.</p>
+    <p><span class="step-label">Bước 3 — Walk through:</span> đi qua hai vòng lặp: vòng ngoài qua từng chuỗi, vòng trong so từng ký tự với prefix hiện tại, rồi cắt chuỗi bằng slice <code>prefix[:i]</code> tại vị trí ký tự đầu tiên khác nhau. Chạy một ví dụ có 3 chuỗi để thấy prefix co lại qua từng bước.</p>
+    <p><span class="step-label">Bước 4 — Complexity:</span> Time O(n·m), Space O(1) — với n là số chuỗi và m là độ dài chuỗi ngắn nhất; ngoài prefix ra không dùng thêm bộ nhớ đáng kể.</p>
+    <div class="task-box">
+      <p><strong>Mẫu câu tiếng Anh — English sentence frames:</strong></p>
+      <ul>
+        <li>Restate: “Write a function to find the longest common prefix string amongst an array of strings.” / “The prefix must be common to all of the strings, not just one pair.” / “If there is no common prefix, return an empty string.”</li>
+        <li>Idea: “The idea is to start with the first string as the prefix, and shrink it as we compare it with each remaining string.” / “The prefix can only shrink, never grow.” / “As soon as the prefix becomes empty, we can return early, because there is nothing left to compare.”</li>
+        <li>Walk through: “I loop over the remaining strings one by one.” / “For each string, I compare characters one position at a time.” / “At the first mismatch, I slice the prefix to that position with <code>prefix[:i]</code>.” / “Then I move on to the next string with the shortened prefix.” / “Let me trace through an example with three strings to show how the prefix shrinks step by step.”</li>
+        <li>Complexity: “The time complexity is O(n·m), where n is the number of strings and m is the length of the shortest string, because in the worst case we compare m characters for each string.” / “The space complexity is O(1), because apart from the prefix itself we use no significant extra memory.”</li>
+      </ul>
+    </div>
+    <p class="keywords"><strong>Keywords bắt buộc:</strong> prefix (tiền tố), common prefix (tiền tố chung), shrink (co lại), slice (cắt chuỗi), longest (dài nhất), amongst (trong số), remaining strings (các chuỗi còn lại), compare character by character (so từng ký tự), one position at a time (từng vị trí một), first mismatch (vị trí khác nhau đầu tiên), shortened prefix (tiền tố đã rút ngắn), empty string (chuỗi rỗng), return early (trả về sớm), step by step (từng bước), shortest string (chuỗi ngắn nhất).</p>
+  </section>
+  <a class="top-link" href="#top">↑ Về đầu trang</a>
+
+  <!-- Bài 4 -->
+  <section class="card" id="bai-4">
+    <h3><span class="card-num">Bài 4</span> — Roman to Integer (LeetCode #13)</h3>
+    <p>Link gốc LeetCode: <a href="https://leetcode.com/problems/roman-to-integer/" target="_blank" rel="noopener">https://leetcode.com/problems/roman-to-integer/</a></p>
+    <div class="task-box">
+      <p><strong>Nhiệm vụ:</strong></p>
+      <ol>
+        <li>Viết lại solution Python ra giấy, không nhìn solution cũ.</li>
+        <li>Thu 1 audio giải thích bằng tiếng Anh theo khung 4 bước.</li>
+        <li>Gửi ảnh giấy và audio ngay sau bài này, đừng dồn cuối.</li>
+      </ol>
+    </div>
+    <h4>Hướng dẫn trả lời audio</h4>
+    <p><span class="step-label">Bước 1 — Restate:</span> nói theo gợi ý: “Convert a Roman numeral string to an integer.” Nêu rõ: input là chuỗi ký tự La Mã, output là số nguyên.</p>
+    <p><span class="step-label">Bước 2 — Idea:</span> kiểm tra theo cặp với nhìn trước (lookahead): trước khi cộng giá trị của ký tự hiện tại, nhìn 2 ký tự <code>s[i:i+2]</code> xem có phải một cặp trừ (subtractive pair) không. Có đúng 6 cặp trừ: IV = 4, IX = 9, XL = 40, XC = 90, CD = 400, CM = 900. Gặp cặp trừ thì cộng giá trị của cả cặp và nhảy <code>i += 2</code>; nếu không thì cộng giá trị của một ký tự và đi tiếp.</p>
+    <p><span class="step-label">Bước 3 — Walk through:</span> đi qua code: từ điển (dictionary) lưu giá trị từng ký tự, vòng lặp <code>while i &lt; len(s)</code>, kiểm tra <code>s[i:i+2]</code> trước rồi mới xử lý ký tự đơn. Chạy một ví dụ có cặp trừ (ví dụ “MCMXCIV”) và chỉ rõ từng lần nhảy <code>i</code>.</p>
+    <p><span class="step-label">Bước 4 — Complexity:</span> Time O(n), Space O(1) — duyệt chuỗi một lần, từ điển có kích thước cố định.</p>
+    <div class="task-box">
+      <p><strong>Mẫu câu tiếng Anh — English sentence frames:</strong></p>
+      <ul>
+        <li>Restate: “Given a Roman numeral string <code>s</code>, convert it to an integer.” / “The input is a string of Roman symbols, and the output is an integer.” / “The input is guaranteed to be a valid Roman numeral in the range from 1 to 3999.”</li>
+        <li>Idea: “The idea is to scan from left to right and check two characters at a time, because six subtractive pairs are written with a smaller numeral before a larger one.” / “We check the two-character slice first; only if it is not a subtractive pair do we take a single character.” / “There are exactly six subtractive pairs: IV, IX, XL, XC, CD and CM.”</li>
+        <li>Walk through: “I build a dictionary that maps each Roman symbol to its value, including the six subtractive pairs.” / “I use a <code>while</code> loop with an index <code>i</code> starting at 0.” / “At each step, I look at the two-character slice <code>s[i:i+2]</code>.” / “If it is in the dictionary, I add its value and advance <code>i</code> by 2.” / “Otherwise, I add the value of the single character <code>s[i]</code> and advance <code>i</code> by 1.” / “Let me trace through “MCMXCIV” and point out each jump of <code>i</code>.”</li>
+        <li>Complexity: “The time complexity is O(n), where n is the length of the string, because we scan the string once.” / “The space complexity is O(1), because the dictionary has a fixed size.”</li>
+      </ul>
+    </div>
+    <p class="keywords"><strong>Keywords bắt buộc:</strong> lookahead (nhìn trước), subtractive pair (cặp trừ), dictionary (từ điển), Roman numeral (số La Mã), Roman symbol (ký tự La Mã), convert (chuyển đổi), scan from left to right (quét từ trái sang phải), map / mapping (ánh xạ), fixed size (kích thước cố định), advance by 1 / by 2 (tiến 1 / 2 bước), single character (một ký tự), two-character slice (lát cắt 2 ký tự), smaller before larger (nhỏ đứng trước lớn), valid (hợp lệ), in the range (trong khoảng).</p>
+  </section>
+  <a class="top-link" href="#top">↑ Về đầu trang</a>
+
+  <!-- Bài 5 -->
+  <section class="card" id="bai-5">
+    <h3><span class="card-num">Bài 5</span> — Valid Parentheses (LeetCode #20)</h3>
+    <p>Link gốc LeetCode: <a href="https://leetcode.com/problems/valid-parentheses/" target="_blank" rel="noopener">https://leetcode.com/problems/valid-parentheses/</a></p>
+    <div class="task-box">
+      <p><strong>Nhiệm vụ:</strong></p>
+      <ol>
+        <li>Viết lại solution Python ra giấy, không nhìn solution cũ.</li>
+        <li>Thu 1 audio giải thích bằng tiếng Anh theo khung 4 bước.</li>
+        <li>Gửi ảnh giấy và audio ngay sau bài này, đừng dồn cuối.</li>
+      </ol>
+    </div>
+    <h4>Hướng dẫn trả lời audio</h4>
+    <p><span class="step-label">Bước 1 — Restate:</span> nói theo gợi ý: “Determine if a bracket string is valid: same-type closing, correct order, every closer has a match.” Nêu đủ 3 điều kiện: ngoặc đóng phải cùng loại, đúng thứ tự, và mọi ngoặc đóng đều có ngoặc mở tương ứng.</p>
+    <p><span class="step-label">Bước 2 — Idea:</span> dùng ngăn xếp (stack) vì mỗi ngoặc đóng phải khớp với ngoặc mở <strong>gần nhất</strong> chưa ghép — đúng nguyên tắc LIFO (vào sau ra trước). Nhấn mạnh 2 chỗ kiểm tra rỗng: gặp ngoặc đóng khi stack rỗng thì false ngay; duyệt hết chuỗi mà stack còn dư ngoặc mở thì cũng false.</p>
+    <p><span class="step-label">Bước 3 — Walk through:</span> đi qua code: gặp ngoặc mở thì push vào stack, gặp ngoặc đóng thì so với phần tử trên đỉnh stack — khớp thì pop, không khớp thì return false. Chạy một ví dụ đúng (ví dụ “()[]{}”) và một ví dụ sai thứ tự (ví dụ “([)]”) để thấy vì sao stack bắt được lỗi.</p>
+    <p><span class="step-label">Bước 4 — Complexity:</span> Time O(n), Space O(n) — duyệt chuỗi một lần, stack có thể chứa tối đa n ngoặc mở.</p>
+    <div class="task-box">
+      <p><strong>Mẫu câu tiếng Anh — English sentence frames:</strong></p>
+      <ul>
+        <li>Restate: “Given a string <code>s</code> containing just the characters <code>'('</code>, <code>')'</code>, <code>'{'</code>, <code>'}'</code>, <code>'['</code> and <code>']'</code>, determine if the input string is valid.” / “An input string is valid if open brackets are closed by the same type of brackets, in the correct order, and every close bracket has a corresponding open bracket.”</li>
+        <li>Idea: “The idea is to use a stack, because each close bracket must match the most recent unmatched open bracket.” / “That is exactly LIFO: last in, first out.” / “If I see a close bracket while the stack is empty, the string is invalid immediately.” / “If the stack still has unmatched open brackets at the end, the string is also invalid.”</li>
+        <li>Walk through: “I iterate through the string one character at a time.” / “When I see an open bracket, I push it onto the stack.” / “When I see a close bracket, I compare it with the element on the top of the stack.” / “If they match, I pop the top element; if they do not match, I return <code>False</code>.” / “At the end, I return <code>True</code> only if the stack is empty.” / “Let me trace through a valid example and an example with the wrong order, to show why the stack catches the error.”</li>
+        <li>Complexity: “The time complexity is O(n), where n is the length of the string, because we scan the string once.” / “The space complexity is O(n), because in the worst case the stack holds n open brackets.”</li>
+      </ul>
+    </div>
+    <p class="keywords"><strong>Keywords bắt buộc:</strong> stack (ngăn xếp), LIFO (last in, first out — vào sau ra trước), corresponding (tương ứng), open/close bracket (ngoặc mở / ngoặc đóng), push onto the stack (đẩy vào ngăn xếp), pop (lấy ra khỏi ngăn xếp), top of the stack (đỉnh ngăn xếp), match (khớp), most recent unmatched (chưa ghép gần nhất), in the correct order (đúng thứ tự), same type (cùng loại), wrong order (sai thứ tự), determine if … is valid (xác định … có hợp lệ không), empty stack (ngăn xếp rỗng), one character at a time (từng ký tự một).</p>
+  </section>
+  <a class="top-link" href="#top">↑ Về đầu trang</a>
+
+  <hr class="divider" />
+
+  <h2 id="phan-2">Phần 2: System Design — 7 lessons</h2>
+  <p class="intro">Cách làm mỗi lesson: đọc câu hỏi tiếng Anh, tự trả lời thành tiếng bằng tiếng Anh và thu audio, rồi gửi audio. Được mở lại bài học để kiểm tra sau khi đã thử trả lời. Khi trả lời, nói thêm trade-off (đánh đổi) — đó là chỗ interviewer hay xoáy sâu.</p>
+
+  <!-- Lesson 1 -->
+  <section class="card" id="lesson-1">
+    <h3><span class="card-num">Lesson 1</span> — Performance vs Scalability; Latency vs Throughput</h3>
+    <div class="question-en">
+      <p><strong>Q1.</strong> Explain the difference between latency and throughput. Give a real-world example.</p>
+      <p><strong>Q2.</strong> What is the difference between vertical and horizontal scaling? When would you use each?</p>
+    </div>
+    <h4>Hướng dẫn trả lời</h4>
+    <p><strong>Q1:</strong> định nghĩa rõ hai khái niệm: latency (độ trễ) là thời gian xử lý xong 1 request (yêu cầu); throughput (thông lượng) là số request xử lý được trong một đơn vị thời gian. Lấy ví dụ đời thật như đường cao tốc hoặc ống nước, và nói rõ: cải thiện cái này không tự động cải thiện cái kia — ví dụ thêm làn xe tăng throughput nhưng không giảm thời gian đi của một xe.</p>
+    <p><strong>Q2:</strong> vertical scaling (scale up — mở rộng theo chiều dọc) là dùng máy to hơn: đơn giản, nhưng bị giới hạn phần cứng và có điểm dừng. Horizontal scaling (scale out — mở rộng theo chiều ngang) là thêm nhiều máy: mở rộng gần như không giới hạn, nhưng cần ứng dụng stateless (không trạng thái) và load balancer (bộ cân bằng tải) phía trước. Nêu khi nào dùng mỗi loại: scale up khi hệ thống còn nhỏ và cần đơn giản; scale out khi cần chịu tải lớn và chịu lỗi.</p>
+    <div class="task-box">
+      <p><strong>Cụm từ / câu mẫu tiếng Anh — English phrases to use:</strong></p>
+      <ul>
+        <li>“Latency is how long one request takes from start to finish.” / “Throughput is how many requests the system can handle per second.”</li>
+        <li>“Improving throughput does not automatically improve latency.” / “For example, adding more lanes increases throughput, but it does not reduce the travel time of a single car.”</li>
+        <li>“The trade-off here is …” / “We choose X over Y because …” / “It depends on …”</li>
+        <li>“Vertical scaling, or scaling up, means using a bigger, more powerful machine.” / “It is simpler, but it hits a hardware limit.” / “Horizontal scaling, or scaling out, means adding more machines.” / “It can scale almost without limit, but it requires stateless services and a load balancer in front.”</li>
+        <li>“We use vertical scaling when the system is still small and simplicity matters most.” / “We use horizontal scaling when we need to handle a large load and tolerate failures.”</li>
+      </ul>
+    </div>
+    <p class="keywords"><strong>Keywords:</strong> scale up / scale out, stateless (không trạng thái), latency (độ trễ), throughput (thông lượng), request (yêu cầu), handle (xử lý), per second (mỗi giây), travel time (thời gian di chuyển), hardware limit (giới hạn phần cứng), more powerful machine (máy mạnh hơn), add more machines (thêm nhiều máy), almost without limit (gần như không giới hạn), large load (tải lớn), tolerate failures (chịu lỗi), simplicity matters (tính đơn giản quan trọng), bottleneck (điểm nghẽn), performance (hiệu năng), scalability (khả năng mở rộng), in front of (phía trước), single request (một request duy nhất).</p>
+  </section>
+  <a class="top-link" href="#top">↑ Về đầu trang</a>
+
+  <!-- Lesson 2 -->
+  <section class="card" id="lesson-2">
+    <h3><span class="card-num">Lesson 2</span> — Availability vs Consistency; CAP</h3>
+    <div class="question-en">
+      <p><strong>Q.</strong> Explain the CAP theorem. Can a distributed system guarantee all three?</p>
+    </div>
+    <h4>Hướng dẫn trả lời</h4>
+    <p>Giải thích đủ 3 thành phần: Consistency (tính nhất quán) — mọi node (nút) thấy cùng một dữ liệu; Availability (tính sẵn sàng) — mọi request đều nhận được phản hồi; Partition tolerance (chịu phân vùng) — hệ thống vẫn hoạt động khi mạng bị chia cắt. Trả lời thẳng: khi xảy ra partition (phân vùng), hệ thống chỉ được chọn 2 trong 3, không thể đảm bảo cả 3.</p>
+    <p>Nêu trade-off (đánh đổi) bằng ví dụ đối lập: hệ CP (chọn consistency) như ngân hàng — thà từ chối giao dịch còn hơn ghi sai số dư; hệ AP (chọn availability) như feed mạng xã hội — chấp nhận dữ liệu hơi cũ để người dùng vẫn xem được. Nói rõ lựa chọn phụ thuộc vào hậu quả của dữ liệu sai, không có đáp án đúng cho mọi hệ thống.</p>
+    <div class="task-box">
+      <p><strong>Cụm từ / câu mẫu tiếng Anh — English phrases to use:</strong></p>
+      <ul>
+        <li>“The CAP theorem states that a distributed system cannot guarantee consistency, availability and partition tolerance all at the same time.”</li>
+        <li>“When a network partition occurs, the system must choose between consistency and availability.” / “You cannot have all three.” / “There is no single right answer for every system.”</li>
+        <li>“The trade-off here is …” / “We choose consistency over availability because …” / “We choose availability over consistency because …” / “It depends on the cost of being wrong.”</li>
+        <li>“For example, a bank is a CP system: it would rather reject a transaction than record a wrong balance.” / “A social media feed is an AP system: it accepts slightly stale data so users can still see the feed.”</li>
+        <li>“Consistency means every node sees the same data.” / “Availability means every request receives a response.” / “Partition tolerance means the system keeps working when the network is split.”</li>
+      </ul>
+    </div>
+    <p class="keywords"><strong>Keywords:</strong> partition (phân vùng), trade-off (đánh đổi), consistency (tính nhất quán), availability (tính sẵn sàng), CAP theorem (định lý CAP), distributed system (hệ thống phân tán), guarantee (đảm bảo), at the same time (cùng lúc), network partition (phân vùng mạng), occurs (xảy ra), reject a transaction (từ chối giao dịch), wrong balance (số dư sai), slightly stale data (dữ liệu hơi cũ), node (nút), receive a response (nhận được phản hồi), keep working (tiếp tục hoạt động), network is split (mạng bị chia cắt), at the cost of (với cái giá là), cost of being wrong (cái giá của dữ liệu sai), strongly consistent (nhất quán mạnh), eventually consistent (nhất quán sau cùng).</p>
+  </section>
+  <a class="top-link" href="#top">↑ Về đầu trang</a>
+
+  <!-- Lesson 3 -->
+  <section class="card" id="lesson-3">
+    <h3><span class="card-num">Lesson 3</span> — DNS</h3>
+    <div class="question-en">
+      <p><strong>Q.</strong> What happens at the DNS level when you type “example.com” into a browser?</p>
+    </div>
+    <h4>Hướng dẫn trả lời</h4>
+    <p>Kể theo đúng thứ tự phân giải: browser cache (bộ nhớ đệm của trình duyệt) → OS cache (bộ nhớ đệm của hệ điều hành) → recursive resolver (máy chủ phân giải đệ quy) → root server (máy chủ gốc) → TLD server (máy chủ tên miền cấp cao nhất) → authoritative server (máy chủ có thẩm quyền) → trả về IP trong A record (bản ghi A).</p>
+    <p>Nói thêm hai ý: TTL (thời gian sống) quyết định bản ghi được cache bao lâu, giúp lần sau phân giải nhanh hơn; và DNS là một hệ thống phân cấp, phân tán — không có một máy chủ duy nhất nào nắm toàn bộ tên miền.</p>
+    <div class="task-box">
+      <p><strong>Cụm từ / câu mẫu tiếng Anh — English phrases to use:</strong></p>
+      <ul>
+        <li>“When you type a domain name into a browser, the browser first checks its own cache.” / “If it misses, the operating system cache is checked next.”</li>
+        <li>“The recursive resolver asks the root server, then the TLD server, then the authoritative server, in that order.” / “The authoritative server returns the IP address in an A record.”</li>
+        <li>“The TTL controls how long a record can be cached.” / “A longer TTL means faster lookups later, but slower updates when the address changes.”</li>
+        <li>“For example, …” / “The key point is that DNS is hierarchical and distributed.” / “No single server holds every domain name.”</li>
+      </ul>
+    </div>
+    <p class="keywords"><strong>Keywords:</strong> resolver (máy chủ phân giải), authoritative (có thẩm quyền), A record (bản ghi A), TTL (thời gian sống), domain name (tên miền), IP address (địa chỉ IP), lookup (tra cứu), resolve (phân giải), browser cache (bộ nhớ đệm của trình duyệt), operating system cache (bộ nhớ đệm của hệ điều hành), recursive resolver (máy chủ phân giải đệ quy), root server (máy chủ gốc), TLD server (máy chủ tên miền cấp cao nhất), hierarchical (phân cấp), distributed (phân tán), in that order (theo đúng thứ tự), cache hit / cache miss (truy vấn trúng / trượt), query (truy vấn), record (bản ghi), update (cập nhật).</p>
+  </section>
+  <a class="top-link" href="#top">↑ Về đầu trang</a>
+
+  <!-- Lesson 4 -->
+  <section class="card" id="lesson-4">
+    <h3><span class="card-num">Lesson 4</span> — CDN push/pull</h3>
+    <div class="question-en">
+      <p><strong>Q.</strong> Compare push vs pull CDN. When would you use each?</p>
+    </div>
+    <h4>Hướng dẫn trả lời</h4>
+    <p>So sánh theo cách nội dung lên edge server (máy chủ biên): pull CDN (kéo theo nhu cầu, lazy) — khi có cache miss (truy vấn trượt), edge server mới kéo nội dung từ origin server (máy chủ gốc) về và cache lại; hợp với nội dung nhỏ, được truy cập thường xuyên, thay đổi linh hoạt. Push CDN (đẩy trước) — nội dung được upload lên edge server trước, trước cả khi có request; hợp với file lớn, ít thay đổi.</p>
+    <p>Nêu trade-off (đánh đổi): pull thì đồng bộ tự nhiên với origin nhưng request đầu tiên chậm; push thì request đầu tiên nhanh nhưng tốn công đồng bộ và lưu trữ khi nội dung cập nhật. Kết luận bằng tiêu chí chọn: nhìn vào kích thước file, tần suất thay đổi và mức độ “hot” của nội dung.</p>
+    <div class="task-box">
+      <p><strong>Cụm từ / câu mẫu tiếng Anh — English phrases to use:</strong></p>
+      <ul>
+        <li>“In a pull CDN, content is fetched from the origin server only when there is a cache miss.” / “The edge server pulls the content on demand, caches it, and serves later requests from the cache.”</li>
+        <li>“In a push CDN, content is uploaded to the edge servers in advance, before any request arrives.”</li>
+        <li>“The trade-off here is …” / “We choose pull over push because …” / “We choose push over pull because …” / “It depends on the file size, how often the content changes, and how hot the content is.”</li>
+        <li>“For example, large files that rarely change, such as software downloads, suit a push CDN.” / “Small, frequently accessed content that changes flexibly suits a pull CDN.” / “With pull, the first request is slower, but the content stays in sync with the origin naturally.” / “With push, the first request is fast, but updates cost extra storage and sync work.”</li>
+      </ul>
+    </div>
+    <p class="keywords"><strong>Keywords:</strong> origin server (máy chủ gốc), cache miss (truy vấn trượt), edge server (máy chủ biên), fetch (kéo về), on demand (theo nhu cầu), upload in advance (đẩy lên trước), in advance (trước), stay in sync (đồng bộ), sync work (công việc đồng bộ), extra storage (lưu trữ thêm), first request (request đầu tiên), frequently accessed (được truy cập thường xuyên), rarely changes (ít thay đổi), file size (kích thước file), how hot the content is (mức độ “hot” của nội dung), serve requests (phục vụ request), lazy (lười biếng, chỉ làm khi cần), content delivery network / CDN (mạng phân phối nội dung).</p>
+  </section>
+  <a class="top-link" href="#top">↑ Về đầu trang</a>
+
+  <!-- Lesson 5 -->
+  <section class="card" id="lesson-5">
+    <h3><span class="card-num">Lesson 5</span> — Load Balancer</h3>
+    <div class="question-en">
+      <p><strong>Q.</strong> How does a load balancer distribute traffic? Name two algorithms and explain session persistence.</p>
+    </div>
+    <h4>Hướng dẫn trả lời</h4>
+    <p>Giải thích vai trò trước: load balancer (bộ cân bằng tải) chia traffic cho nhiều server để không server nào quá tải, và loại server chết ra khỏi vòng phân phối nhờ health check (kiểm tra sức khỏe).</p>
+    <p>Kể ít nhất 2 thuật toán phân phối: round robin (xoay vòng — chia đều theo lượt), least connections (ít kết nối nhất — đưa request tới server đang rảnh nhất), và có thể thêm IP hash (băm theo IP — cùng một client luôn về cùng một server).</p>
+    <p>Giải thích session persistence (duy trì phiên): vì sao cần — một user đang đăng nhập không thể bị đẩy qua lại giữa các server mất session; hai cách giải quyết: sticky session (phiên dính — dùng cookie của load balancer để giữ user ở một server, đơn giản nhưng server chết thì mất session) và shared session qua Redis (phiên dùng chung — mọi server cùng đọc session từ Redis, chịu lỗi tốt hơn nhưng thêm một tầng phụ thuộc).</p>
+    <div class="task-box">
+      <p><strong>Cụm từ / câu mẫu tiếng Anh — English phrases to use:</strong></p>
+      <ul>
+        <li>“A load balancer spreads traffic across multiple servers so that no single server is overloaded.” / “It removes unhealthy servers from rotation using health checks.”</li>
+        <li>“Round robin sends requests to servers in turn, one after another.” / “Least connections sends the next request to the server with the fewest active connections.” / “IP hash always sends the same client to the same server.”</li>
+        <li>“Session persistence means the same user keeps returning to the same server, so their session is not lost.” / “The trade-off here is …” / “We choose X over Y because …”</li>
+        <li>“With a sticky session, the load balancer uses a cookie to keep the user on one server.” / “It is simple, but if that server fails, the session is lost.” / “With a shared session in Redis, every server reads the session from Redis, so any server can serve the user.” / “That is more fault-tolerant, but Redis becomes an extra dependency.”</li>
+        <li>“For example, a logged-in user must not be bounced between servers and lose their session.”</li>
+      </ul>
+    </div>
+    <p class="keywords"><strong>Keywords:</strong> sticky session (phiên dính), health check (kiểm tra sức khỏe), round robin (xoay vòng), least connections (ít kết nối nhất), spread traffic (chia traffic), overloaded (quá tải), unhealthy server (server không khỏe), remove from rotation (loại khỏi vòng phân phối), in turn (theo lượt), fewest active connections (ít kết nối đang hoạt động nhất), IP hash (băm theo IP), same client (cùng một client), session persistence (duy trì phiên), keep returning to (tiếp tục quay về), cookie, fault-tolerant (chịu lỗi), extra dependency (tầng phụ thuộc thêm), logged-in user (user đang đăng nhập), bounce between servers (bị đẩy qua lại giữa các server).</p>
+  </section>
+  <a class="top-link" href="#top">↑ Về đầu trang</a>
+
+  <!-- Lesson 6 -->
+  <section class="card" id="lesson-6">
+    <h3><span class="card-num">Lesson 6</span> — SQL vs NoSQL</h3>
+    <div class="question-en">
+      <p><strong>Q.</strong> When would you choose SQL over NoSQL, and vice versa?</p>
+    </div>
+    <h4>Hướng dẫn trả lời</h4>
+    <p>Chọn SQL khi: dữ liệu có quan hệ (relational) rõ ràng, cần join (nối bảng) và cần ACID (tính nguyên tử, nhất quán, cô lập, bền vững) — ví dụ giao dịch ngân hàng, đơn hàng. Schema (lược đồ) cố định là điểm mạnh khi dữ liệu có cấu trúc ổn định.</p>
+    <p>Chọn NoSQL khi: dữ liệu không theo quan hệ bảng hoặc cần mở rộng ngang lớn. Kể đúng 4 họ NoSQL và ví dụ dùng: key-value (khóa–giá trị) cho cache/session; document (tài liệu) cho dữ liệu lồng nhau, schema linh hoạt; wide-column (cột rộng) cho dữ liệu lớn theo cột; graph (đồ thị) cho quan hệ nhiều–nhiều phức tạp như mạng xã hội.</p>
+    <p>Chốt bằng tiêu chí chọn: nhìn vào hình dạng dữ liệu và mức consistency (tính nhất quán) cần thiết — không chọn theo độ “hot” của công nghệ.</p>
+    <div class="task-box">
+      <p><strong>Cụm từ / câu mẫu tiếng Anh — English phrases to use:</strong></p>
+      <ul>
+        <li>“We choose SQL when the data is relational, we need joins, and we need ACID guarantees.” / “For example, banking transactions and orders need strong consistency.”</li>
+        <li>“We choose NoSQL when the data does not fit a table model, the schema needs to be flexible, or we need to scale out to a very large size.”</li>
+        <li>“The trade-off here is …” / “We choose X over Y because …” / “The deciding factors are the shape of the data and how much consistency we need — not how popular the technology is.”</li>
+        <li>“A fixed schema is a strength when the data structure is stable.” / “A flexible schema is a strength when the fields vary from record to record.”</li>
+        <li>“There are four families of NoSQL: key-value for cache and sessions; document for nested data with a flexible schema; wide-column for very large columnar data; and graph for complex many-to-many relationships, such as a social network.”</li>
+      </ul>
+    </div>
+    <p class="keywords"><strong>Keywords:</strong> relational (quan hệ), ACID, schema (lược đồ), join (nối bảng), fixed schema (lược đồ cố định), flexible schema (lược đồ linh hoạt), scale out (mở rộng theo chiều ngang), strong consistency (tính nhất quán mạnh), data model (mô hình dữ liệu), shape of the data (hình dạng dữ liệu), key-value store (kho khóa–giá trị), document store (kho tài liệu), wide-column store (kho cột rộng), graph database (cơ sở dữ liệu đồ thị), nested data (dữ liệu lồng nhau), many-to-many relationships (quan hệ nhiều–nhiều), vary from record to record (khác nhau theo từng bản ghi), table model (mô hình bảng), deciding factor (yếu tố quyết định), guarantee (đảm bảo), atomicity, consistency, isolation, durability (tính nguyên tử, nhất quán, cô lập, bền vững).</p>
+  </section>
+  <a class="top-link" href="#top">↑ Về đầu trang</a>
+
+  <!-- Lesson 7 -->
+  <section class="card" id="lesson-7">
+    <h3><span class="card-num">Lesson 7</span> — Cache</h3>
+    <div class="question-en">
+      <p><strong>Q1.</strong> Compare cache-aside, write-through, and write-behind. When would you use each?</p>
+      <p><strong>Q2.</strong> Your cache hit rate is dropping and users see stale data. How do you diagnose and fix it?</p>
+    </div>
+    <h4>Hướng dẫn trả lời</h4>
+    <p><strong>Q1:</strong> cache-aside — application (ứng dụng) tự quản lý cache, đọc thì miss mới vào database rồi ghi lại cache; phổ biến nhất, linh hoạt nhưng application phức tạp hơn. Write-through — ghi đồng thời vào cache và database, cache luôn khớp nhưng mỗi lần ghi chậm hơn. Write-behind — ghi vào cache trước, ghi xuống database sau (bất đồng bộ), nhanh nhất nhưng có rủi ro mất dữ liệu nếu cache chết trước khi ghi xong. Nêu trade-off (đánh đổi) của cả ba rồi mới kết luận khi nào dùng mỗi loại.</p>
+    <p><strong>Q2:</strong> chẩn đoán theo 3 hướng: TTL (thời gian sống) — quá dài thì dữ liệu cũ (stale data), quá ngắn thì hit rate (tỉ lệ trúng) tụt; eviction (loại bỏ) — kiểm tra chính sách loại bỏ, chuyển sang LRU (loại bỏ ít dùng gần đây nhất) nếu cache đầy; cold start (khởi động lạnh) — cache trống sau deploy hoặc restart, khắc phục bằng pre-warm (làm nóng trước) và rollout (triển khai) dần. Nhắc thêm thundering herd (hiệu ứng bầy đàn): nhiều request cùng miss một key và cùng dồn vào database — khắc phục bằng khóa, request coalescing (gộp request) hoặc stale-while-revalidate (trả dữ liệu cũ trong lúc làm mới).</p>
+    <div class="task-box">
+      <p><strong>Cụm từ / câu mẫu tiếng Anh — English phrases to use:</strong></p>
+      <ul>
+        <li>Q1: “In cache-aside, the application manages the cache itself.” / “On a miss, the application reads from the database and then writes the result back to the cache.” / “It is the most common pattern, and it is flexible, but the application becomes more complex.”</li>
+        <li>Q1: “In write-through, every write goes to the cache and the database at the same time, so the cache always matches the database, but each write is slower.” / “In write-behind, the write goes to the cache first and to the database later, asynchronously, so writes are the fastest, but there is a risk of data loss if the cache fails before the write reaches the database.”</li>
+        <li>Q1: “The trade-off here is consistency versus write speed, and the risk of data loss.” / “We choose X over Y because …” / “For example, …”</li>
+        <li>Q2: “First, I would check whether the TTL is too long, because a long TTL keeps stale data.” / “If the TTL is too short, the hit rate drops.” / “Next, I would check the eviction policy, and switch to LRU — least recently used — if the cache is full.”</li>
+        <li>Q2: “A cold start after a deployment or a restart leaves the cache empty, so I would pre-warm the cache and roll out gradually.” / “A thundering herd happens when many requests miss the same key at once and flood the database, so I would add locking, request coalescing, or stale-while-revalidate.” / “Let me explain my diagnosis step by step: first …, then …, finally …”</li>
+      </ul>
+    </div>
+    <p class="keywords"><strong>Keywords:</strong> TTL (thời gian sống), eviction (loại bỏ), hit rate (tỉ lệ trúng), stale data (dữ liệu cũ), cold start (khởi động lạnh), cache-aside, write-through, write-behind, cache hit / cache miss (truy vấn trúng / trượt), write back to the cache (ghi lại vào cache), at the same time (đồng thời), asynchronously (bất đồng bộ), data loss (mất dữ liệu), risk (rủi ro), eviction policy (chính sách loại bỏ), LRU — least recently used (loại bỏ ít dùng gần đây nhất), cache is full (cache đầy), pre-warm (làm nóng trước), roll out gradually (triển khai dần), thundering herd (hiệu ứng bầy đàn), flood the database (dồn vào database), locking (khóa), request coalescing (gộp request), stale-while-revalidate (trả dữ liệu cũ trong lúc làm mới), diagnosis (chẩn đoán), step by step (từng bước), most common pattern (mẫu phổ biến nhất).</p>
+  </section>
+  <a class="top-link" href="#top">↑ Về đầu trang</a>
+
+  <hr class="divider" />
+
+  <section class="card" id="checklist">
+    <h2>Checklist cuối buổi ôn</h2>
+    <ul class="checklist">
+      <li>5 audio DSA đã gửi, kèm ảnh giấy viết tay của cả 5 bài.</li>
+      <li>Các câu hỏi System Design (Lesson 1–7) đã trả lời bằng audio tiếng Anh.</li>
+      <li>Đã kiểm tra lại bằng bài học sau khi trả lời, ở những chỗ còn chưa chắc.</li>
+      <li>Đã nghỉ ít nhất 30 phút, không nhìn màn hình, trước giờ thi thật.</li>
+      <li>Sẵn sàng cho đề thi thật tối nay — random, khó hơn, không có hướng dẫn.</li>
+    </ul>
+  </section>
+  <a class="top-link" href="#top">↑ Về đầu trang</a>
+
+</main>
+</body>
+</html>
