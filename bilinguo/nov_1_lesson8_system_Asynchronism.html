@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <link rel="icon" href="data:," />
+    <title>System Design Bài 8 — Asynchronism</title>
+    <style>
+      * { box-sizing: border-box; }
+      html { background: #000; }
+      body {
+        margin: 0;
+        padding: 20px;
+        background: #000;
+        color: #fff;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 21px;
+        line-height: 1.8;
+      }
+      main { width: 100%; }
+      h1 { font-size: 30px; line-height: 1.3; margin: 0 0 8px; }
+      h2 { font-size: 25px; line-height: 1.35; margin: 0 0 10px; }
+      h3 { font-size: 22px; line-height: 1.4; margin: 22px 0 6px; }
+      p { margin: 10px 0; }
+      ul { padding-left: 22px; margin: 10px 0; }
+      li { margin: 8px 0; }
+      a { color: #7cc4ff; }
+      .sub { color: #ccc; font-size: 18px; margin: 0 0 18px; }
+      .card {
+        background: #111;
+        border: 1px solid #333;
+        border-radius: 10px;
+        padding: 18px;
+        margin: 18px 0;
+      }
+      .toc ul { list-style: none; padding-left: 0; }
+      .toc li { margin: 6px 0; }
+      .toc a { text-decoration: none; }
+      .linkback { color: #ddd; }
+      .example {
+        background: #1a1a1a;
+        border: 1px solid #555;
+        border-radius: 10px;
+        padding: 14px 16px;
+        margin: 16px 0 8px;
+      }
+      .example p { margin: 0; }
+      .top { font-size: 17px; margin: 14px 0 0; }
+      .kw-term { margin: 6px 0; }
+      .src { color: #bbb; font-size: 17px; }
+    </style>
+  </head>
+  <body>
+    <main id="top">
+      <h1>System Design — Bài 8: Asynchronism (Bất đồng bộ)</h1>
+      <p class="sub">Hàng đợi tin nhắn (message queue) &amp; hàng đợi tác vụ (task queue).<br />
+      Bài ngắn, đọc dưới 5 phút. Giải thích bằng tiếng Việt, thuật ngữ tiếng Anh trong ngoặc.<br />
+      Nguồn: system-design-primer, mục Asynchronism.</p>
+
+      <nav class="card toc" aria-label="Mục lục">
+        <p><b>Mục lục — bấm để nhảy tới phần đó</b></p>
+        <ul>
+          <li><a href="#s1">1. Vấn đề của đồng bộ</a></li>
+          <li><a href="#s2">2. Hàng đợi tin nhắn là gì</a></li>
+          <li><a href="#s3">3. Hàng đợi tác vụ cho việc nặng</a></li>
+          <li><a href="#s4">4. Cái giá phải trả</a></li>
+          <li><a href="#s5">5. Khi nào dùng + ví dụ tổng hợp</a></li>
+          <li><a href="#keywords">Keywords — từ khóa theo từng phần</a></li>
+        </ul>
+      </nav>
+
+      <section class="card" id="s1">
+        <h2>1. Vấn đề của đồng bộ (synchronous)</h2>
+        <p class="linkback"><b>Nối với bài cũ:</b> Bài 1 đã dạy độ trễ (latency) và lưu lượng (throughput). Mới ở đây: áp dụng ý đó vào cuộc gọi chặn (blocking call).</p>
+        <p>Trong cách làm đồng bộ (synchronous), khi một thành phần gọi một việc chậm — ví dụ ghi vào cơ sở dữ liệu (database) hay gửi email — nó phải chờ việc đó xong mới làm tiếp.</p>
+        <p>Lúc chờ, cuộc gọi chặn (block) luồng (thread) đang xử lý. Luồng bị giữ thì không phục vụ request khác được, nên độ trễ (latency) tăng và lưu lượng (throughput) giảm. Nói ngắn gọn: user trả giá bằng thời gian chờ cho những việc mà họ không cần thấy ngay.</p>
+        <div class="example">
+          <p><b>Ví dụ 1:</b> user đặt vé, server gửi email xác nhận ngay trong cùng request → user phải chờ email gửi xong mới thấy kết quả.</p>
+        </div>
+        <p class="top"><a href="#top">↑ Về đầu trang</a></p>
+      </section>
+
+      <section class="card" id="s2">
+        <h2>2. Hàng đợi tin nhắn (message queue) là gì</h2>
+        <p class="linkback"><b>Nối với bài cũ:</b> Bài 5 đã dạy bộ cân bằng tải (load balancer) dàn đều traffic ra nhiều server. Mới ở đây: hàng đợi (queue) là cách khác để sống sót qua đột biến lưu lượng (traffic spike) — đệm (buffer) request thay vì dàn đều chúng.</p>
+        <p>Hàng đợi tin nhắn (message queue) là nơi giữ tin nhắn (message) giữa hai phía: bên sản xuất (producer) bỏ tin nhắn vào hàng đợi (queue), bên tiêu thụ (consumer) lấy ra và xử lý sau.</p>
+        <p>Hai phía không cần chờ nhau, cũng không cần biết nhau đang chạy hay không. Bên sản xuất gửi xong là xong việc của mình; bên tiêu thụ xử lý khi rảnh. Nhờ đó, khi request ập đến dồn dập, hệ thống không bắt bên tiêu thụ xử lý ngay lập tức — hàng đợi đệm (buffer) chúng lại. Một số hệ thống hàng đợi thường gặp: RabbitMQ, Kafka, AWS SQS.</p>
+        <div class="example">
+          <p><b>Ví dụ 2:</b> 10.000 đơn hàng ập đến cùng lúc — thay vì 10.000 request đè sập server, hàng đợi xếp hàng và bên tiêu thụ xử lý dần.</p>
+        </div>
+        <p class="top"><a href="#top">↑ Về đầu trang</a></p>
+      </section>
+
+      <section class="card" id="s3">
+        <h2>3. Hàng đợi tác vụ (task queue) cho việc nặng</h2>
+        <p class="linkback"><b>Nối với bài cũ:</b> xây trên §2 (hàng đợi tin nhắn). Mới ở đây: hàng đợi tác vụ quản lý công việc cần chạy, kèm thử lại, lên lịch và theo dõi kết quả — điều §2 chưa dạy.</p>
+        <p>Việc nặng (heavy work) — thay đổi kích thước ảnh (resizing ảnh), mã hóa video (encoding video), gửi 1 triệu email — không nên làm trong request. Nó được đẩy cho tiến trình nền (background worker) xử lý.</p>
+        <p>Hàng đợi tác vụ (task queue) nhận việc và giao cho các worker. So với hàng đợi tin nhắn, nó thường thêm: thử lại (retry) khi việc thất bại, lên lịch (scheduling) để chạy việc vào giờ hẹn, và theo dõi kết quả (result tracking) để biết việc xong hay hỏng. Phân biệt một câu (mới, chưa dạy trước đây): hàng đợi tin nhắn chuyển tin nhắn giữa các dịch vụ (service); hàng đợi tác vụ quản lý công việc cần chạy — kèm thử lại, lên lịch và kết quả. Ví dụ công cụ: Celery, RQ.</p>
+        <div class="example">
+          <p><b>Ví dụ 3:</b> user tải video lên → request trả về ngay, worker của Celery mã hóa video ở nền, báo xong qua thông báo (notification).</p>
+        </div>
+        <p class="top"><a href="#top">↑ Về đầu trang</a></p>
+      </section>
+
+      <section class="card" id="s4">
+        <h2>4. Cái giá phải trả (trade-offs)</h2>
+        <p class="linkback"><b>Nối với bài cũ:</b> Bài 7 dạy rằng mọi thành phần đều có đánh đổi (trade-off). Mới ở đây: áp dụng ý đó cho hàng đợi — đây là ứng dụng mới, không phải kiến thức đã dạy.</p>
+        <ul>
+          <li>Nhiều bộ phận chuyển động (moving parts) hơn = độ phức tạp (complexity) cao hơn.</li>
+          <li>Tin nhắn có thể bị mất (lost) hoặc trùng lặp (duplicate): giao ít nhất một lần (at-least-once delivery) có thể trùng lặp; giao tối đa một lần (at-most-once delivery) có thể mất mát.</li>
+          <li>Khó gỡ lỗi (debug) và giám sát (monitor) hơn: việc chạy ở nền, lỗi không hiện ngay trước mặt user.</li>
+          <li>Bên tiêu thụ chậm (slow consumer) → hàng đợi đầy dần — áp lực ngược (backpressure).</li>
+        </ul>
+        <div class="example">
+          <p><b>Ví dụ 4:</b> bên tiêu thụ xử lý 10 tin/giây nhưng bên sản xuất đẩy 1.000 tin/giây → hàng đợi phình to, RAM cạn.</p>
+        </div>
+        <p class="top"><a href="#top">↑ Về đầu trang</a></p>
+      </section>
+
+      <section class="card" id="s5">
+        <h2>5. Khi nào dùng + ví dụ tổng hợp</h2>
+        <p class="linkback"><b>Nối với bài cũ:</b> tổng hợp Bài 1 (độ trễ, lưu lượng), Bài 5 (đột biến lưu lượng) và §4 (đánh đổi). Mới ở đây: bộ tiêu chí chọn dùng bất đồng bộ (asynchronism).</p>
+        <p>Dùng khi: user không cần đáp án ngay; việc cần làm thì nặng; lưu lượng thất thường, lúc cao lúc thấp.</p>
+        <p>Không dùng khi đáp án bắt buộc phải có ngay trong request đó, hoặc khi thêm hàng đợi chỉ làm hệ thống phức tạp hơn mà chẳng bớt chờ bao nhiêu.</p>
+        <div class="example">
+          <p><b>Ví dụ 5 (tổng hợp):</b> đặt vé xem phim — request trả về “đang xử lý (processing)” ngay lập tức; hàng đợi lo phần còn lại sau: gửi email vé + trừ ghế trong cơ sở dữ liệu (database).</p>
+        </div>
+        <p class="top"><a href="#top">↑ Về đầu trang</a></p>
+      </section>
+
+      <section class="card" id="keywords">
+        <h2>Keywords — từ khóa theo từng phần</h2>
+        <p>Mỗi thuật ngữ: tiếng Việt (tiếng Anh).</p>
+
+        <h3>§1 — Đồng bộ</h3>
+        <p class="kw-term">đồng bộ (synchronous) · chặn (block) · luồng (thread) · độ trễ (latency) · lưu lượng (throughput)</p>
+
+        <h3>§2 — Hàng đợi tin nhắn</h3>
+        <p class="kw-term">bên sản xuất (producer) · bên tiêu thụ (consumer) · tin nhắn (message) · hàng đợi (queue) · hàng đợi tin nhắn (message queue) · đột biến lưu lượng (traffic spike) · đệm (buffer) · RabbitMQ · Kafka · AWS SQS</p>
+
+        <h3>§3 — Hàng đợi tác vụ</h3>
+        <p class="kw-term">hàng đợi tác vụ (task queue) · tiến trình nền (background worker) · thử lại (retry) · lên lịch (scheduling) · theo dõi kết quả (result tracking) · Celery · RQ</p>
+
+        <h3>§4 — Đánh đổi</h3>
+        <p class="kw-term">đánh đổi (trade-off) · độ phức tạp (complexity) · bộ phận chuyển động (moving parts) · giao ít nhất một lần (at-least-once delivery) · giao tối đa một lần (at-most-once delivery) · trùng lặp (duplicate) · mất mát (lost) · gỡ lỗi (debug) · giám sát (monitor) · bên tiêu thụ chậm (slow consumer) · áp lực ngược (backpressure)</p>
+
+        <h3>§5 — Khi nào dùng</h3>
+        <p class="kw-term">đang xử lý (processing) · bất đồng bộ (asynchronism)</p>
+
+        <h3>Chung</h3>
+        <p class="kw-term">dịch vụ (service) · cơ sở dữ liệu (database) · thông báo (notification) · việc nặng (heavy work) · request · worker</p>
+
+        <p class="top"><a href="#top">↑ Về đầu trang</a></p>
+      </section>
+
+      <p class="src">Nguồn: system-design-primer, mục Asynchronism. Bài 8 trong chuỗi System Design (sau Bài 7: Cache).</p>
+    </main>
+  </body>
+</html>
