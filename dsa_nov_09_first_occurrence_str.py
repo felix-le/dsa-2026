@@ -13,3 +13,17 @@ Constraints:
 1 <= haystack.length, needle.length <= 10^4
 haystack and needle consist of only lowercase English characters.
 """
+
+class Solution(object):
+    def strStr(self,haystack, needle):
+        if len(needle) > len(haystack):
+            return -1
+        for start in range(len(haystack) - len(needle) + 1):
+            match = True
+            for j in range(len(needle)):
+                if haystack[start + j] != needle[j]:
+                    match = False
+                    break
+            if match:
+                return start
+        return -1
