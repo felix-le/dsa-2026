@@ -23,7 +23,7 @@ haystack and needle consist of only lowercase English letters.
 
 def countOccurs(self, haystack, needle):
     if len(needle) > len(haystack):
-        return -1
+        return 0
 
     countRepeatTime = 0
     
@@ -34,6 +34,6 @@ def countOccurs(self, haystack, needle):
             if haystack[start + j] != needle[j]:
                 match = False
                 break
-            if match:
-                countRepeatTime += 1
+        if match:
+            countRepeatTime += 1
     return countRepeatTime
