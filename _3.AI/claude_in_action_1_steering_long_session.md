@@ -77,3 +77,7 @@ All versions will have the same `.gitignore` file, so `.env` will not be pushed.
 3. Rewind when needed.
 4. Set specific goals (identify when it is done).
 5. Run parallel work with worktrees.
+
+> Rewinding restores the code, the conversation, or both to an earlier checkpoint that Claude Code creates at each prompt.
+>
+> Anything you write after /compact tells Claude what the summary must keep, so follow the command with a short instruction naming the work that still matters.
