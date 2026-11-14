@@ -34,3 +34,4 @@ htmlcov/
 
 # Editors
 .idea/
+.DS_Store
