@@ -129,3 +129,5 @@ It is matched literally as a name → no match → login fails.
 
 **Recap**:
 Who attacks, how and which layer stops them?
+
+PKCE (Proof Key for Code Exchange) protects the OAuth authorization code flow: the client sends a hash of a secret, the code_challenge, with the authorization request, and later proves it holds the original secret, the code_verifier, when exchanging the code — so a stolen code alone is useless."
