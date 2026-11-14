@@ -33,9 +33,9 @@ Managed → Claude uses npm. Local, Project, and User are all overridden.
 ### When to Use Each Location
 
 - **Managed policy:** Use for rules that must apply to every project and every team member.
-- **User:** Use for personal preferences that should apply across all projects.
-- **Project:** Use for team conventions that should be version-controlled and shared.
 - **Local:** Use for private, repository-specific rules that should not be pushed.
+- **Project:** Use for team conventions that should be version-controlled and shared.
+- **User:** Use for personal preferences that should apply across all projects.
 
 ### When Rules Conflict
 
