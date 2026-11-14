@@ -22,7 +22,7 @@ It can stop/block a tool call before it runs.
 - `ask`
 - `defer` (rarely use it for non-interactive -`p` run, pause then resume)
 
-### One Context, Three Decisions
+### 1.1 One Context, Three Decisions
 
 **Context:** Claude wants to run:
 
@@ -140,7 +140,7 @@ RIGHT:
 updatedInput: (.tool_input | .command |= gsub("sk_live_\\w+"; "REDACTED"))
 ```
 
-## Exit codes, for hooks that don't return JSON
+## 2. Exit Codes for Hooks That Do Not Return JSON
 
 The hook's exit code controls what happens to the tool call:
 
@@ -155,7 +155,7 @@ written to `stderr` is sent back to Claude for exit code `2`; for other
 non-zero codes, it is logged and Claude continues. `SessionStart`,
 `UserPromptSubmit`, and `UserPromptExpansion` can use plain text as context.
 
-### One Simple Example
+### 2.1 One Context, Three Exit Results
 
 **One context:** Claude wants to run:
 
@@ -223,7 +223,7 @@ Warning: the branch was not checked.
 
 Result: Claude continues, so the push can still run and reach `main`.
 
-### A real guardrail: readact instead of block
+### 2.2 A Real Guardrail: Redact Instead of Block
 
 We have a hook PreToolUse for Bash. we will:
 
@@ -283,7 +283,7 @@ updatedInput: keep all command `tool_input` bur replace `key` by `REDACTED`
 > `chmod +x .claude/hooks/redact-secrets.sh`
 > ```
 
-### Preserving state across a compact
+### 2.3 Preserving State Across a Compact
 
 this hook for combining `SessionStart` with matcher `compact` run after compress:
 
