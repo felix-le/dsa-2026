@@ -30,6 +30,24 @@ Who wins?
 Managed → Claude uses npm. Local, Project, and User are all overridden.
 ```
 
+### When to Use Each Location
+
+- **Managed policy:** Use for rules that must apply to every project and every team member.
+- **User:** Use for personal preferences that should apply across all projects.
+- **Project:** Use for team conventions that should be version-controlled and shared.
+- **Local:** Use for private, repository-specific rules that should not be pushed.
+
+### When Rules Conflict
+
+When multiple rule files define different behavior, the rule with the higher priority wins:
+
+1. Managed policy
+2. Local
+3. Project
+4. User
+
+Keep rules at the narrowest appropriate scope. Use a higher-priority scope only when the rule must override a broader project or user preference.
+
 ## 3. Split Up a Big File with Imports
 
 Organize a large file with imports:
@@ -40,7 +58,15 @@ Organize a large file with imports:
 @.claude/conventions/workflow.md
 ```
 
-## 4. Phrasing
+## 4. Hooks in Practice
+
+Use a `PreToolUse` hook for rules that must be enforced before an action runs.
+
+For example, a hook can inspect a command and block it when it contains a dangerous action such as deleting the repository or pushing directly to `main`.
+
+This is stronger than writing "Never do this" in `CLAUDE.md`, because the hook can prevent the action instead of only describing the rule.
+
+## 5. Phrasing
 
 - Be specific and checkable.
 
