@@ -4,4 +4,12 @@ My study repo for software engineer interview prep: DSA (LeetCode, Python), Syst
 
 **Goal:** Complete 100 LeetCode Easy + 100 LeetCode Medium problems.
 
-**Progress so far:** 12 LeetCode Easy solved · System Design lessons 1–12 done · Claude Code in Action certificate done · SQL paused until January 2027.
+**Progress**
+
+```
+LeetCode Easy        ██░░░░░░░░░░░░░░░░░░  12/100 · 12%
+LeetCode Medium      ░░░░░░░░░░░░░░░░░░░░  0/100 · 0%
+System Design        ███████████████░░░░░  12/16 topics · 75%
+AI certificates      █████░░░░░░░░░░░░░░░  1/4 · 25%
+SQL                  ░░░░░░░░░░░░░░░░░░░░  paused until Jan 2027
+```
